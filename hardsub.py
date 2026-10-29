@@ -415,6 +415,69 @@ def translate_srt(src: str, dst: str) -> None:
     write_srt(cues, dst)
 
 
+# ------------------------------------------------------------------------ sheets
+SHEET_ROWS = 10            # cue crops per contact sheet; more and the glyphs get too small
+
+
+def make_sheets(video: str, srt: str, out: str) -> int:
+    """One subtitle crop per cue (at its midpoint), stacked 10 to an image with the
+    cue number in the margin, so a person or a vision model can proof-read the OCR
+    against the real pixels."""
+    from PIL import ImageDraw
+    os.makedirs(out, exist_ok=True)
+    cues = read_srt(srt)
+    crops = []
+    for i, c in enumerate(cues, 1):
+        p = os.path.join(out, f"c{i:03d}.png")
+        if not os.path.exists(p):
+            subprocess.run(
+                ["ffmpeg", "-v", "error", "-y", "-ss", f"{(c['start'] + c['end']) / 2:.2f}",
+                 "-i", video, "-frames:v", "1", "-vf", "crop=iw:ih*0.22:0:ih*0.76", p],
+                check=True)
+        crops.append(p)
+    for k in range(0, len(crops), SHEET_ROWS):
+        ims = [Image.open(p).convert("RGB") for p in crops[k:k + SHEET_ROWS]]
+        w, h = ims[0].size
+        sheet = Image.new("RGB", (w + 40, h * len(ims)), "black")
+        d = ImageDraw.Draw(sheet)
+        for j, im in enumerate(ims):
+            sheet.paste(im, (40, j * h))
+            d.text((4, j * h + h // 2 - 6), str(k + j + 1), fill=(255, 255, 0))
+            d.line([0, j * h, w + 40, j * h], fill=(255, 255, 0))
+        sheet.save(os.path.join(out, f"sheet{k // SHEET_ROWS + 1:02d}.png"))
+    return (len(crops) + SHEET_ROWS - 1) // SHEET_ROWS
+
+
+def apply_review(srt: str, review: str, zh_out: str, en_out: str) -> int:
+    """Rebuild the SRTs from a proof-read file of `N|中文|English` lines (one per cue
+    of `srt`). An empty 中文 drops that cue (a duplicate or junk read) and lets the
+    previous cue run on over its time. Spaces in 中文 and ` / ` in English become
+    line breaks."""
+    cues = read_srt(srt)
+    rows = {}
+    for line in open(review, encoding="utf-8"):
+        line = line.rstrip("\n")
+        if line.strip():
+            n, zh, en = line.split("|", 2)
+            rows[int(n)] = (zh.strip(), en.strip())
+    missing = [i for i in range(1, len(cues) + 1) if i not in rows]
+    if missing:
+        raise SystemExit(f"review has no line for cues {missing[:10]}")
+    zh_cues, en_cues = [], []
+    for i, c in enumerate(cues, 1):
+        zh, en = rows[i]
+        if not zh:
+            for o in (zh_cues, en_cues):
+                if o and c["start"] - o[-1]["end"] < 1.0:
+                    o[-1]["end"] = c["end"]
+            continue
+        zh_cues.append({"start": c["start"], "end": c["end"], "text": zh.replace(" ", "\n")})
+        en_cues.append({"start": c["start"], "end": c["end"], "text": en.replace(" / ", "\n")})
+    write_srt(zh_cues, zh_out)
+    write_srt(en_cues, en_out)
+    return len(zh_cues)
+
+
 # -------------------------------------------------------------------------- main
 def main() -> None:
     p = argparse.ArgumentParser(description="recover + translate burned-in subtitles")
@@ -443,7 +506,27 @@ def main() -> None:
     sp.add_argument("--start", type=float, default=0.0)
     sp.add_argument("--end", type=float, default=0.0)
 
+    sp = sub.add_parser("sheets", help="contact sheets of every cue, for proof-reading")
+    sp.add_argument("video")
+    sp.add_argument("srt")
+    sp.add_argument("-o", "--out", required=True, help="folder for the sheets")
+
+    sp = sub.add_parser("apply", help="rebuild zh/en SRTs from a proof-read N|zh|en file")
+    sp.add_argument("srt", help="the .zh.srt the review was numbered against")
+    sp.add_argument("review")
+    sp.add_argument("--zh", required=True)
+    sp.add_argument("--en", required=True)
+
     args = p.parse_args()
+
+    if args.cmd == "sheets":
+        n = make_sheets(args.video, args.srt, args.out)
+        print(f"  {n} sheets -> {args.out}")
+        return
+    if args.cmd == "apply":
+        n = apply_review(args.srt, args.review, args.zh, args.en)
+        print(f"  {n} cues -> {os.path.basename(args.zh)}, {os.path.basename(args.en)}")
+        return
 
     if args.cmd == "ocr":
         print(f"OCR {os.path.basename(args.video)}")

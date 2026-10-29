@@ -206,12 +206,73 @@ PP-OCR misses the **same** characters every time on a given font. These are not 
 
 **When you start a new series, extend `CONFUSIONS` in `hardsub.py` first.** Run `ocr` on a 5-minute slice, read the output, add the patterns you see — 20 minutes of that raises accuracy more than any model swap. Keep the table per-font; it does not generalise across different masters.
 
+### Best quality: the proof-read pass (what the user wants for finished episodes)
+
+OCR + rules is only a draft. Measured on 生死訟 ep 2 against the real frames: **39% of lines exactly right** (190/487); most of the rest were missing a glyph or had a look-alike, and some flipped the meaning (`插他們` "beat them up" was really `捅他們` "stab them"). Google Translate on top of that is worse still. For an episode the user will actually watch, do this. The user asked for it explicitly: they want *you* (Claude, on their subscription) to read the frames and translate, not an API.
+
+**Per episode, in order:**
+
+```powershell
+cd "C:\AI STUFF\Local\tvbaw"
+$env:PYTHONIOENCODING='utf-8'
+$ep = "downloads\The Intangible Truth - 生死訟 - 1990\003 Episode 03"
+python hardsub.py all "$ep.mp4"                                   # 1. OCR draft (~2 min)
+python hardsub.py sheets "$ep.mp4" "$ep.raw-ocr.zh.srt" -o <scratch>\ep03   # 2. ~50 contact sheets
+```
+
+3. **Read every sheet** (`sheet01.png` … ~50 images, 10 cues each, cue number in the yellow margin). For every cue write one line, `N|corrected 中文|English`, into a review file in your scratchpad:
+   - Chinese exactly as on screen; a space between the two subtitle lines.
+   - English translated **from the corrected Chinese, with scene context**, not per line in isolation. Two speakers in one cue → separate with ` / `.
+   - **Empty Chinese (`N||`) drops the cue.** Use it for repeat frames of the same subtitle and for junk; the previous cue then runs on over its time.
+   - If a frame shows no subtitle (the cue midpoint fell between lines), keep the OCR text if it is plausible and fix it from context.
+   - There must be a line for every cue number, or `apply` refuses.
+4. **Build the files:**
+   ```powershell
+   python hardsub.py apply "$ep.raw-ocr.zh.srt" <review.txt> --zh "$ep.zh.srt" --en "$ep.en.srt"
+   ```
+   If a Google draft `.en.srt` is there, rename it to `.google.en.srt` first so it is kept for comparison.
+5. **Second check (mandatory; the user asked for it).** Print the finished pairs side by side and read all of them:
+   ```powershell
+   python -c "import sys;sys.path.insert(0,'.');import hardsub as H;z=H.read_srt(r'$ep.zh.srt');e=H.read_srt(r'$ep.en.srt');print(len(z),len(e));[print(i,H.ts(a['start'])[3:8],a['text'],'|',b['text']) for i,(a,b) in enumerate(zip(z,e),1)]"
+   ```
+   Confirm: same cue count, same timings, no empty line, no Chinese left in the English, and every English line says what its Chinese says. Fix what you find, then report to the user: cue count, OCR accuracy (how many lines were already exactly right), notable meaning fixes, and anything you are unsure of.
+
+**Cost:** ~50 image reads plus ~500 lines of writing per episode. That is a real share of the user's subscription limits, so do one episode at a time and check before doing a batch of them.
+
+**Known gap:** the pass only checks moments where OCR found a subtitle. A line the OCR missed entirely stays missing.
+
+**Episode files when done:**
+
+```
+002 Episode 02.zh.srt            proof-read Chinese (auto-loads)
+002 Episode 02.en.srt            proof-read English (auto-loads)
+002 Episode 02.raw-ocr.zh.srt    straight OCR, for comparison
+002 Episode 02.google.en.srt     machine translation of the OCR, for comparison
+```
+
+**Series glossary: 生死訟, keep consistent across episodes**
+
+| Chinese | English | who |
+|---|---|---|
+| 馬海 | Ma Hai | son; car mechanic, about to go to sea (跑船) |
+| 馬潔 | Ma Jie | elder sister; runs the vegetable stall |
+| 馬泳 | Ma Yong | youngest sister, schoolgirl |
+| 馬洋 | Ma Yang | son of the father's other (wealthy) family; calls his mother 媽咪 "Mummy" |
+| 葉蔚 / 火柴頭 | Ye Wei / "Matchstick" | Ma Hai's tomboy friend |
+| 葉榮生 | Ye Rongsheng | Ye Wei's father, dying in hospital |
+| 狐狸精 | vixen | what each wife calls the other |
+| 冬節 / 過冬節 | the Winter Solstice | family festival; "冬比年大" = the Solstice matters more than New Year |
+| 大陸 | the mainland | |
+| 高利貸 / 放高利貸的 | loan sharks | |
+
+Ep 1 still has only the old OCR + Google pilot (first 11m40s, in `_subtitle_pilot`). Ep 2 is the only one done with the proof-read pass.
+
 ### Quality you can promise
 
 - raw OCR: ~75% of lines correct
 - after junk filter + cleanup: **~80–85%**
 - remaining failures are unknown words (`是呀起上還肯給你開庭重` — `起上` is not a word) and lost capitalisation
-- **never claim a finished translation.** Call it a rough draft and let the user read it.
+- **never claim a finished translation** from OCR + Google alone. Call it a rough draft. Only an episode that has been through the proof-read pass above counts as finished.
 
 ### Verify before batching
 
