@@ -1,3 +1,60 @@
+# dltvb
+
+Downloaders for two Asian-drama streaming sites plus a burned-in subtitle
+recovery tool. Each one was built by reverse-engineering the player chain rather
+than scraping HTML.
+
+| Tool | Site / purpose | Pipeline | Ceiling | Speed |
+|---|---|---|---|---|
+| `tvbaw.py` | `tvbanywherena.com` | Brightcove playlist → playback API → progressive MP4 (ranged, 8 conns) | up to 1920×1080 | ~32–35 MB/s |
+| `aidrama.py` | `aidrama.me` | WordPress REST → videoss API → AES-128 HLS (decrypt + remux) | 854×480 | ~19 MB/s |
+| `hardsub.py` | any video with **burned-in** subs | ffmpeg crop → OCR → junk filter → character repair → translate | n/a | ~2–3 min/episode |
+
+Both downloaders select the highest-quality source automatically; neither needs a login.
+
+## Quick start
+
+```powershell
+pip install -r requirements.txt        # requests, cryptography, rapidocr, opencc, Pillow
+# ffmpeg must be on PATH
+
+python tvbaw.py series 3751                    # inspect: episode count, languages, ids, folder name
+python tvbaw.py dl 3751 -c 8 -j 3              # whole series: best quality + subtitles, always
+python aidrama.py dl "https://aidrama.me/<series>/" -c 16 -j 2
+python hardsub.py all "<episode>.mp4"          # OCR + translate burned-in subtitles
+```
+
+Highest quality and subtitles are **on by default** — no flags needed.
+`--no-subs` / `--no-mux` exist only to opt out.
+
+Output:
+
+```
+downloads/English Name - Chinese Name - Year/001 Episode 01.mp4
+                                            001 Episode 01.en.vtt
+                                            001 Episode 01.zh-HK.vtt
+```
+
+e.g. `The Intangible Truth - 生死訟 - 1990/`, `This City Never Sleeps - 璀璨之城 (EN) - 2026/`.
+The year is read from the series JSON-LD (`datePublished`); the English name from the URL slug.
+
+## Repo layout
+
+| File | Purpose |
+|---|---|
+| `tvbaw.py` | TVBAnywhere downloader — `series`, `links`, `dl`, `subs`, `browse` |
+| `aidrama.py` | aidrama.me downloader — `series`, `links`, `dl` |
+| `hardsub.py` | burned-in subtitle recovery — `ocr`, `cleanup`, `translate`, `all` |
+| `estimate_category.py` | sizes up a whole browse category (shows/episodes/TB) before committing |
+| `HANDOFF.md` | runbook for the next operator: paste a link → one command; §5b covers hardsub |
+| `README.md` | this file; detailed protocol notes for every site |
+| `estimate_2000s.json` | sample output: all 227 shows in the 2000s category (≈4.2 TB) |
+
+Not committed: `downloads/`, `.state/` (cached policy key), generated `links-*.json`
+(those URLs carry short-lived signed tokens — regenerate them).
+
+---
+
 # tvbaw — TVBAnywhere North America downloader
 
 Scratch-built tool for `tvbanywherena.com`. Resolves a series to **all** episode
@@ -87,7 +144,6 @@ year from the series JSON-LD `datePublished`. Episode titles are transliterated
 ---
 
 # aidrama.py — aidrama.me (WordPress + obfuscated HLS)
-
 Different site, completely different pipeline. `aidrama.me` is a WordPress site
 whose "player" is a three-hop iframe chain ending in an AES-128 HLS stream with
 every anti-scrape trick in the book: disguised extensions, rotating segment
@@ -179,3 +235,59 @@ Details worth recording:
 no captcha, AES key served openly. Hydrax only wins on resolution (720p vs 480p)
 and that 720p is unreachable without watching the ad per episode.
 `aidrama.py` therefore keeps `hls` as the only implemented server.
+
+---
+
+# hardsub.py — burned-in subtitles (OCR → clean → translate)
+
+Some catalogue titles have no caption tracks at all: the Chinese is painted into
+the picture (e.g. `生死訟` / 2906, `第三類法庭` / 1754). No player can translate
+that — VLC/mpv/PotPlayer only translate *soft* tracks. The text has to be read
+off the pixels and turned into a file first.
+
+```powershell
+python hardsub.py all "<episode>.mp4"                      # full episode
+python hardsub.py all "<episode>.mp4" --start 0 --end 700  # slice, for a quality check
+python hardsub.py ocr "<episode>.mp4" -o x.zh.srt
+python hardsub.py cleanup x.zh.srt -o x.clean.zh.srt --translate
+```
+
+Outputs `<video>.zh.srt` and `<video>.en.srt` beside the video, named to match, so
+VLC/Plex auto-load them.
+
+## Why it is built this way
+
+| Step | What | Why |
+|---|---|---|
+| crop + 1 fps frames | `crop=iw:ih*0.30:0:ih*0.68` | only the subtitle band is decoded |
+| row-ink line split | `line_bands()` | the PP-OCR **detector** costs ~1000 ms/frame (90 min/episode); splitting lines by brightness and calling the **recogniser** only costs ~30 ms/frame (60–90 s/episode) |
+| junk filter | `is_junk()` | drops signage/credits — measured 9 of 91 cues, no dialogue lost |
+| temporal voting | `group()` | same cue spans 4–8 frames; the most frequent reading wins |
+| confusion table | `CONFUSIONS` | PP-OCR misses the *same* characters every time per font, so they are rules not luck |
+| OpenCC `s2t` | `to_traditional()` | OCR mixes simplified into traditional output |
+| translate | public Google endpoint, no key | ~0.1 s/cue |
+
+## The confusion table matters most
+
+```
+磨/擎 → 麼   (怎磨→怎麼, 基磨→甚麼)      骞 → 審  (重骞→重審)
+遗 → 還       (遗肯→還肯)                赖 → 報  (好赖→好報)
+雨 → 兩       (雨个→兩個)                毅人 → 殺人 (放火毅人→放火殺人)
+道 → 這       (道个→這個, 道種→這種)      检查 → 檢察官
+雞道 → 難道                              洋赢 → 贏
+```
+
+Running `ocr` over a 5-minute slice and adding the patterns you see raises
+accuracy more than any model swap. The table is per-font; it does not generalise
+across masters.
+
+## Quality and cost
+
+- raw OCR ≈ 75% of lines correct; after junk filter + cleanup ≈ **80–85%**
+- ~2–3 min per 46-minute episode → ~1–1.5 h for 25 episodes
+- **treat it as a rough draft, never a finished translation**
+
+To improve: use the highest-resolution copy available for OCR (pixels-per-glyph
+dominates accuracy), extend `CONFUSIONS` per series, try `--fps 2` for tighter cue
+boundaries, then an LLM context pass over the whole episode to fix words a
+14-pixel glyph cannot resolve.

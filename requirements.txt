@@ -1,8 +1,12 @@
 # Runtime deps. Python 3.10+.
 #   pip install -r requirements.txt
-requests>=2.31          # both tools
-cryptography>=42        # aidrama.py only (AES-128 HLS segments)
+requests>=2.31                      # both downloaders
+cryptography>=42                    # aidrama.py  (AES-128 HLS segments)
+rapidocr-onnxruntime>=1.3           # hardsub.py  (PP-OCRv3, ONNX, no torch needed)
+opencc-python-reimplemented>=0.1.7  # hardsub.py  (simplified -> traditional normalisation)
+Pillow>=10                          # hardsub.py  (frame crops)
 
 # System deps (not pip):
-#   ffmpeg  — required for HLS-only titles (tvbaw) and remux/decrypt (aidrama), subtitle muxing
-#   ffprobe — ships with ffmpeg; used to verify the downloaded resolution
+#   ffmpeg  — HLS-only titles (tvbaw), AES decrypt/remux (aidrama),
+#             subtitle muxing, and frame extraction for hardsub OCR
+#   ffprobe — ships with ffmpeg; used to verify resolution and probe sources
