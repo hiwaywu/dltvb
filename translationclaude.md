@@ -29,18 +29,18 @@ $env:PYTHONIOENCODING='utf-8'
 $ep = "downloads\The Intangible Truth - 生死訟 - 1990\003 Episode 03"
 ```
 
-### 1. OCR draft (about 2 minutes)
+### 1. OCR for the timings only (about 1.5 minutes)
 
 ```powershell
-python hardsub.py all "$ep.mp4"
+python hardsub.py ocr "$ep.mp4" -o <scratchpad>\ep03\raw.zh.srt
 ```
 
-This writes `.raw-ocr.zh.srt` (the timings you will keep), `.zh.srt` (rule-cleaned) and `.en.srt` (Google). Rename the Google one to `.google.en.srt` straight away. It is only for comparison, and step 4 writes the real `.en.srt`.
+**Use `ocr`, not `all`.** The user does not want Google Translate or any OCR file in the episode folder: the OCR is only there to find *when* each subtitle appears. Write it to the scratchpad. The episode folder ends up with exactly two subtitle files, `.en.srt` and `.zh.srt`.
 
 ### 2. Contact sheets (about 1 minute)
 
 ```powershell
-python hardsub.py sheets "$ep.mp4" "$ep.raw-ocr.zh.srt" -o <scratchpad>\ep03
+python hardsub.py sheets "$ep.mp4" <scratchpad>\ep03\raw.zh.srt -o <scratchpad>\ep03
 ```
 
 This takes one crop of the subtitle band at the **midpoint of every cue**, stacked 10 to a sheet with the cue number in a yellow margin. About 50 sheets per 46-minute episode. Ten per sheet is the limit; any more and the glyphs get too small to read reliably.
@@ -64,12 +64,12 @@ Rules that produced the episode 2 result:
 - **Names:** use the glossary below. Add new characters to it as you meet them.
 - **Unsure?** Give your best reading, and list the cue numbers in your report to the user.
 
-A line must exist for every cue number in `.raw-ocr.zh.srt`, or `apply` refuses.
+A line must exist for every cue number in `raw.zh.srt`, or `apply` refuses.
 
 ### 4. Build the SRTs
 
 ```powershell
-python hardsub.py apply "$ep.raw-ocr.zh.srt" <scratchpad>\ep03-review.txt --zh "$ep.zh.srt" --en "$ep.en.srt"
+python hardsub.py apply <scratchpad>\ep03\raw.zh.srt <scratchpad>\ep03\review.txt --zh "$ep.zh.srt" --en "$ep.en.srt"
 ```
 
 ### 5. Second check (mandatory)
@@ -99,9 +99,9 @@ Give the cue count, the OCR accuracy (how many lines were already exactly right)
 003 Episode 03.mp4
 003 Episode 03.en.srt            <- Claude's English. The one to watch with (auto-loads)
 003 Episode 03.zh.srt            <- Claude's proof-read Chinese (auto-loads)
-003 Episode 03.raw-ocr.zh.srt    straight OCR, for comparison
-003 Episode 03.google.en.srt     Google Translate of the OCR, for comparison
 ```
+
+Nothing else. No raw OCR, no Google translation: the user asked for only these two.
 
 ---
 
@@ -124,6 +124,13 @@ Give the cue count, the OCR accuracy (how many lines were already exactly right)
 | 鬼王深 / 深哥 | Ghost King Shen / Brother Shen | Tsim Sha Tsui triad boss the father owes |
 | 珍姊 | Sister Zhen | vegetable-market neighbour |
 | 佳叔 | Uncle Jia | runs the garage where Ma Hai works |
+| 阿立 / 立哥 | Ah Li | Ma Jie's policeman boyfriend; Mum's favourite |
+| 張志雄 / 志雄 | Zhang Zhixiong / Zhixiong | market stallholder, secretly fond of Ma Jie |
+| 葉螢影 / 螢影 | Ye Yingying / Yingying | Ye Wei's half-sister from the mainland (ep 3) |
+| 銀婆婆 | Granny Yin | Ye Wei's grandmother |
+| 先鋒 | Xianfeng | the father's partner in Guangzhou; pushes him toward drug smuggling |
+| 家佑 | Jiayou | errand boy in Guangzhou (林家佑, the fire victim in ep 1's trial) |
+| 馮哥 | Brother Feng | Guangzhou loan shark |
 | 光州市 | Guangzhou | the show's spelling (光 not 廣) for the mainland city; kept as Guangzhou |
 | 狐狸精 | vixen | what each wife calls the other |
 | 冬節 / 過冬節 | the Winter Solstice | family festival; 冬比年大 "the Solstice matters more than New Year" |
