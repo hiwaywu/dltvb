@@ -1,0 +1,1843 @@
+{
+  "summary": {
+    "category": "https://tvbanywherena.com/en/browse?year=2000s",
+    "series_total": 227,
+    "series_ok": 223,
+    "series_failed": 4,
+    "episodes": 6204,
+    "hours": 4199.9,
+    "total_bytes": 3632245444723,
+    "total_gb": 3382.8,
+    "avg_bytes_per_ep": 585468317,
+    "top5_by_size": [
+      {
+        "name": "皆大歡喜",
+        "gb": 119.0,
+        "episodes": 164
+      },
+      {
+        "name": "同事三分親",
+        "gb": 65.7,
+        "episodes": 100
+      },
+      {
+        "name": "畢打自己人",
+        "gb": 65.5,
+        "episodes": 100
+      },
+      {
+        "name": "畢打自己人",
+        "gb": 65.2,
+        "episodes": 100
+      },
+      {
+        "name": "畢打自己人",
+        "gb": 65.1,
+        "episodes": 100
+      }
+    ],
+    "elapsed_s": 52.3
+  },
+  "rows": [
+    {
+      "slug": "2780-Safe-Guards",
+      "name": "鐵血保鏢",
+      "episodes": 25,
+      "seconds": 65528,
+      "bytes_per_ep": 718122634,
+      "bytes_total": 17953065850
+    },
+    {
+      "slug": "2857-A-Handful-Of-Love",
+      "name": "一屋兩家三姓人",
+      "episodes": 20,
+      "seconds": 53015,
+      "bytes_per_ep": 723367389,
+      "bytes_total": 14467347780
+    },
+    {
+      "slug": "2902-Placebo-Cure",
+      "name": "心理心裏有個謎",
+      "episodes": 20,
+      "seconds": 53019,
+      "bytes_per_ep": 725759402,
+      "bytes_total": 14515188040
+    },
+    {
+      "slug": "2973-Network-Love-Story",
+      "name": "一網情深",
+      "episodes": 20,
+      "seconds": 58093,
+      "bytes_per_ep": 781220395,
+      "bytes_total": 15624407900
+    },
+    {
+      "slug": "2974-Love-And-Again",
+      "name": "駁命老公追老婆",
+      "episodes": 20,
+      "seconds": 53041,
+      "bytes_per_ep": 727809697,
+      "bytes_total": 14556193940
+    },
+    {
+      "slug": "2981-At-Point-Blank",
+      "name": "婚姻乏術",
+      "episodes": 20,
+      "seconds": 52883,
+      "bytes_per_ep": 729101228,
+      "bytes_total": 14582024560
+    },
+    {
+      "slug": "2994-Strike-at-Heart",
+      "name": "驚艷一槍",
+      "episodes": 20,
+      "seconds": 53537,
+      "bytes_per_ep": 740413774,
+      "bytes_total": 14808275480
+    },
+    {
+      "slug": "3009-Stephens-Diary",
+      "name": "老馮日記",
+      "episodes": 11,
+      "seconds": 15416,
+      "bytes_per_ep": 347095406,
+      "bytes_total": 3818049466
+    },
+    {
+      "slug": "3014-Lost-In-Love",
+      "name": "大囍之家",
+      "episodes": 21,
+      "seconds": 56451,
+      "bytes_per_ep": 740267673,
+      "bytes_total": 15545621133
+    },
+    {
+      "slug": "3037-Vigilante-Force",
+      "name": "智勇新警界",
+      "episodes": 30,
+      "seconds": 78936,
+      "bytes_per_ep": 723629842,
+      "bytes_total": 21708895260
+    },
+    {
+      "slug": "3090-Guts-Of-Man",
+      "name": "肝膽崑崙",
+      "episodes": 20,
+      "seconds": 52456,
+      "bytes_per_ep": 715514725,
+      "bytes_total": 14310294500
+    },
+    {
+      "slug": "3093-The-Driving-Power",
+      "name": "非常外父",
+      "episodes": 20,
+      "seconds": 52910,
+      "bytes_per_ep": 725794627,
+      "bytes_total": 14515892540
+    },
+    {
+      "slug": "3094-Back-To-Square-One",
+      "name": "撲水冤家",
+      "episodes": 20,
+      "seconds": 52948,
+      "bytes_per_ep": 721942458,
+      "bytes_total": 14438849160
+    },
+    {
+      "slug": "3137-At-Home-With-Love",
+      "name": "樓住有情人",
+      "episodes": 20,
+      "seconds": 52592,
+      "bytes_per_ep": 720132918,
+      "bytes_total": 14402658360
+    },
+    {
+      "slug": "3209-Summer-Heat",
+      "name": "心慌·心郁·逐個捉",
+      "episodes": 20,
+      "seconds": 52846,
+      "bytes_per_ep": 722583735,
+      "bytes_total": 14451674700
+    },
+    {
+      "slug": "3222-Net-Deception",
+      "name": "追魂交易 (EN)",
+      "episodes": 20,
+      "seconds": 52920,
+      "bytes_per_ep": 728421884,
+      "bytes_total": 14568437680
+    },
+    {
+      "slug": "3252-Sunshine-Heartbeat",
+      "name": "赤沙印記@四葉草.2",
+      "episodes": 13,
+      "seconds": 33709,
+      "bytes_per_ep": 702637426,
+      "bytes_total": 9134286538
+    },
+    {
+      "slug": "3254-Ultimate-Crime-Fighter",
+      "name": "通天乾探 (EN)",
+      "episodes": 37,
+      "seconds": 97067,
+      "bytes_per_ep": 718364084,
+      "bytes_total": 26579471108
+    },
+    {
+      "slug": "3312-MoneyMaker-Recipe",
+      "name": "師奶股神",
+      "episodes": 21,
+      "seconds": 56347,
+      "bytes_per_ep": 1374657426,
+      "bytes_total": 28867805946
+    },
+    {
+      "slug": "3372-Lost-In-The-Chamber-Of-Love",
+      "name": "西廂奇緣",
+      "episodes": 20,
+      "seconds": 53012,
+      "bytes_per_ep": 721464104,
+      "bytes_total": 14429282080
+    },
+    {
+      "slug": "3419-Pages-Of-Treasures",
+      "name": "Pages Of Treasures",
+      "episodes": 20,
+      "seconds": 52146,
+      "bytes_per_ep": 0,
+      "bytes_total": 0
+    },
+    {
+      "slug": "3457-To-Grow-With-Love",
+      "name": "肥田囍事",
+      "episodes": 21,
+      "seconds": 54996,
+      "bytes_per_ep": 715834232,
+      "bytes_total": 15032518872
+    },
+    {
+      "slug": "3459-CIB-Files",
+      "name": "刑事情報科",
+      "episodes": 20,
+      "seconds": 52488,
+      "bytes_per_ep": 716540044,
+      "bytes_total": 14330800880
+    },
+    {
+      "slug": "3654-The-Rising-Sun-II",
+      "name": "朝陽II",
+      "episodes": 8,
+      "seconds": 21377,
+      "bytes_per_ep": 703951121,
+      "bytes_total": 5631608968
+    },
+    {
+      "slug": "2571-Wise-Guys-Never-Die",
+      "name": "提防老千",
+      "episodes": 1,
+      "seconds": 5161,
+      "bytes_per_ep": 2701995300,
+      "bytes_total": 2701995300
+    },
+    {
+      "slug": "2572-Beauty-And-The-7-Beasts",
+      "name": "七擒七縱七色狼",
+      "episodes": 1,
+      "seconds": 5962,
+      "bytes_per_ep": 3114456484,
+      "bytes_total": 3114456484
+    },
+    {
+      "slug": "2573-Bullet-And-Brain",
+      "name": "神槍手與智多星",
+      "episodes": 1,
+      "seconds": 5457,
+      "bytes_per_ep": 2851250333,
+      "bytes_total": 2851250333
+    },
+    {
+      "slug": "2574-Kung-Fu-Mahjong-3-The-Final-Duel",
+      "name": "雀聖3自摸三百番",
+      "episodes": 1,
+      "seconds": 5439,
+      "bytes_per_ep": 2843842872,
+      "bytes_total": 2843842872
+    },
+    {
+      "slug": "2575-The-Way-We-Are",
+      "name": "天水圍的日與夜",
+      "episodes": 1,
+      "seconds": 5450,
+      "bytes_per_ep": 2850465303,
+      "bytes_total": 2850465303
+    },
+    {
+      "slug": "2576-Night-And-Fog",
+      "name": "天水圍的夜與霧",
+      "episodes": 1,
+      "seconds": 7230,
+      "bytes_per_ep": 3778919242,
+      "bytes_total": 3778919242
+    },
+    {
+      "slug": "2577-On-His-Majestys-Secret-Service",
+      "name": "大內密探靈靈狗",
+      "episodes": 1,
+      "seconds": 5864,
+      "bytes_per_ep": 3070449266,
+      "bytes_total": 3070449266
+    },
+    {
+      "slug": "2578-To-Live-Or-Die-In-Mongkok",
+      "name": "旺角監獄",
+      "episodes": 1,
+      "seconds": 5730,
+      "bytes_per_ep": 2996520930,
+      "bytes_total": 2996520930
+    },
+    {
+      "slug": "2603-The-Threshold-Of-A-Persona",
+      "name": "ID 精英",
+      "episodes": 30,
+      "seconds": 78537,
+      "bytes_per_ep": 1374595574,
+      "bytes_total": 41237867220
+    },
+    {
+      "slug": "2606-A-Case-Of-Misadventure",
+      "name": "騎呢大狀",
+      "episodes": 20,
+      "seconds": 52890,
+      "bytes_per_ep": 725844913,
+      "bytes_total": 14516898260
+    },
+    {
+      "slug": "2630-In-The-Realm-Of-Fancy",
+      "name": "繾綣仙凡間",
+      "episodes": 20,
+      "seconds": 53016,
+      "bytes_per_ep": 722275407,
+      "bytes_total": 14445508140
+    },
+    {
+      "slug": "2634-The-Stamp-Of-Love",
+      "name": "肥婆奶奶扭計媳",
+      "episodes": 20,
+      "seconds": 53841,
+      "bytes_per_ep": 738768138,
+      "bytes_total": 14775362760
+    },
+    {
+      "slug": "2667-Treasure-Raiders",
+      "name": "蕭十一郎",
+      "episodes": 20,
+      "seconds": 53065,
+      "bytes_per_ep": 724878761,
+      "bytes_total": 14497575220
+    },
+    {
+      "slug": "2669-Wo-Hu",
+      "name": "臥虎",
+      "episodes": 1,
+      "seconds": 6077,
+      "bytes_per_ep": 3178635800,
+      "bytes_total": 3178635800
+    },
+    {
+      "slug": "2671-Luxury-Fantasy",
+      "name": "A貨B貨",
+      "episodes": 1,
+      "seconds": 5949,
+      "bytes_per_ep": 3113224941,
+      "bytes_total": 3113224941
+    },
+    {
+      "slug": "2672-The-Vampire-Who-Admires-Me",
+      "name": "有隻殭屍暗戀你",
+      "episodes": 1,
+      "seconds": 5539,
+      "bytes_per_ep": 2890495863,
+      "bytes_total": 2890495863
+    },
+    {
+      "slug": "2678-Kung-Fu-Master-Wong-Fei-Hung",
+      "name": "仁者黃飛鴻",
+      "episodes": 33,
+      "seconds": 89643,
+      "bytes_per_ep": 742743044,
+      "bytes_total": 24510520452
+    },
+    {
+      "slug": "2679-Flowers-In-Storm",
+      "name": "暴雨梨花",
+      "episodes": 40,
+      "seconds": 110313,
+      "bytes_per_ep": 1437999631,
+      "bytes_total": 57519985240
+    },
+    {
+      "slug": "2680-Rough-Justice",
+      "name": "十大奇冤",
+      "episodes": 36,
+      "seconds": 102122,
+      "bytes_per_ep": 779560781,
+      "bytes_total": 28064188116
+    },
+    {
+      "slug": "2689-The-Legend-Of-Love",
+      "name": "牛郎織女",
+      "episodes": 20,
+      "seconds": 52896,
+      "bytes_per_ep": 0,
+      "bytes_total": 0
+    },
+    {
+      "slug": "2704-Fate-Twisters",
+      "name": "黑夜彩虹",
+      "episodes": 22,
+      "seconds": 58590,
+      "bytes_per_ep": 728174188,
+      "bytes_total": 16019832136
+    },
+    {
+      "slug": "2731-Good-Against-Evil",
+      "name": "點指賊賊賊捉賊",
+      "episodes": 20,
+      "seconds": 52708,
+      "bytes_per_ep": 723634613,
+      "bytes_total": 14472692260
+    },
+    {
+      "slug": "2749-Fight-For-Love",
+      "name": "談談情練練武",
+      "episodes": 20,
+      "seconds": 52918,
+      "bytes_per_ep": 722378409,
+      "bytes_total": 14447568180
+    },
+    {
+      "slug": "2772-A-Legend-Returns-Sam-Hui",
+      "name": "歌神再現啟示錄",
+      "episodes": 2,
+      "seconds": 4119,
+      "bytes_per_ep": 558533077,
+      "bytes_total": 1117066154
+    },
+    {
+      "slug": "2172-The-Slicing-Of-The-Demon",
+      "name": "凶城計中計",
+      "episodes": 20,
+      "seconds": 52489,
+      "bytes_per_ep": 0,
+      "bytes_total": 0
+    },
+    {
+      "slug": "2205-Doomed-To-Oblivion",
+      "name": "鄭板橋",
+      "episodes": 30,
+      "seconds": 79205,
+      "bytes_per_ep": 725603290,
+      "bytes_total": 21768098700
+    },
+    {
+      "slug": "2207-The-Vigilante-In-The-Mask",
+      "name": "怪俠一枝梅",
+      "episodes": 20,
+      "seconds": 53016,
+      "bytes_per_ep": 727508715,
+      "bytes_total": 14550174300
+    },
+    {
+      "slug": "2239-Kung-Fu-Mahjong-2",
+      "name": "雀聖2自摸天后",
+      "episodes": 1,
+      "seconds": 5790,
+      "bytes_per_ep": 3029283140,
+      "bytes_total": 3029283140
+    },
+    {
+      "slug": "2240-My-Wife-Is-A-Gambling-Maestro",
+      "name": "我老婆係賭聖",
+      "episodes": 1,
+      "seconds": 5820,
+      "bytes_per_ep": 3044313936,
+      "bytes_total": 3044313936
+    },
+    {
+      "slug": "2288-Street-Fighters",
+      "name": "廟街·媽·兄弟",
+      "episodes": 22,
+      "seconds": 58747,
+      "bytes_per_ep": 733722975,
+      "bytes_total": 16141905450
+    },
+    {
+      "slug": "2312-Find-The-Light",
+      "name": "英雄‧刀‧少年",
+      "episodes": 20,
+      "seconds": 52807,
+      "bytes_per_ep": 729424236,
+      "bytes_total": 14588484720
+    },
+    {
+      "slug": "2319-A-Tribute-To-Leslie-Cheung-Miss-You-Much",
+      "name": "追.憶 張國榮",
+      "episodes": 1,
+      "seconds": 2792,
+      "bytes_per_ep": 758367241,
+      "bytes_total": 758367241
+    },
+    {
+      "slug": "2333-Best-Selling-Secrets-1",
+      "name": "同事三分親",
+      "episodes": 100,
+      "seconds": 128671,
+      "bytes_per_ep": 346684825,
+      "bytes_total": 34668482500
+    },
+    {
+      "slug": "2334-Best-Selling-Secrets-2",
+      "name": "同事三分親",
+      "episodes": 100,
+      "seconds": 133125,
+      "bytes_per_ep": 368541399,
+      "bytes_total": 36854139900
+    },
+    {
+      "slug": "2335-Best-Selling-Secrets-3",
+      "name": "同事三分親",
+      "episodes": 100,
+      "seconds": 135584,
+      "bytes_per_ep": 704969189,
+      "bytes_total": 70496918900
+    },
+    {
+      "slug": "2336-Best-Selling-Secrets-4",
+      "name": "同事三分親",
+      "episodes": 64,
+      "seconds": 85877,
+      "bytes_per_ep": 699428675,
+      "bytes_total": 44763435200
+    },
+    {
+      "slug": "2402-Heavenly-InLaws",
+      "name": "我外母唔係人",
+      "episodes": 20,
+      "seconds": 52353,
+      "bytes_per_ep": 720000329,
+      "bytes_total": 14400006580
+    },
+    {
+      "slug": "2438-Broadcast-Life",
+      "name": "FM701",
+      "episodes": 102,
+      "seconds": 130790,
+      "bytes_per_ep": 353041119,
+      "bytes_total": 36010194138
+    },
+    {
+      "slug": "2490-Life-Begins-At-Forty",
+      "name": "花樣中年",
+      "episodes": 20,
+      "seconds": 52896,
+      "bytes_per_ep": 723456981,
+      "bytes_total": 14469139620
+    },
+    {
+      "slug": "2493-Incurable-Traits",
+      "name": "醫神華陀",
+      "episodes": 20,
+      "seconds": 53525,
+      "bytes_per_ep": 729663673,
+      "bytes_total": 14593273460
+    },
+    {
+      "slug": "2494-Ups-And-Downs",
+      "name": "無業樓民",
+      "episodes": 21,
+      "seconds": 57459,
+      "bytes_per_ep": 730254975,
+      "bytes_total": 15335354475
+    },
+    {
+      "slug": "2495-Greed-Mask",
+      "name": "謎情家族",
+      "episodes": 20,
+      "seconds": 52786,
+      "bytes_per_ep": 716378715,
+      "bytes_total": 14327574300
+    },
+    {
+      "slug": "2531-Whatever-It-Takes",
+      "name": "天子尋龍",
+      "episodes": 20,
+      "seconds": 52985,
+      "bytes_per_ep": 0,
+      "bytes_total": 0
+    },
+    {
+      "slug": "2533-Lofty-Waters-Verdant-Bow",
+      "name": "雲海玉弓緣",
+      "episodes": 20,
+      "seconds": 53059,
+      "bytes_per_ep": 729985328,
+      "bytes_total": 14599706560
+    },
+    {
+      "slug": "2534-Invisible-Journey",
+      "name": "彩色世界",
+      "episodes": 21,
+      "seconds": 55507,
+      "bytes_per_ep": 703403413,
+      "bytes_total": 14771471673
+    },
+    {
+      "slug": "2556-The-Battle-Against-Evil",
+      "name": "轉世驚情",
+      "episodes": 20,
+      "seconds": 53008,
+      "bytes_per_ep": 725177476,
+      "bytes_total": 14503549520
+    },
+    {
+      "slug": "2560-Seed-Of-Hope",
+      "name": "俗世情真",
+      "episodes": 30,
+      "seconds": 79319,
+      "bytes_per_ep": 725620675,
+      "bytes_total": 21768620250
+    },
+    {
+      "slug": "2570-Dont-Open-Your-Eyes",
+      "name": "鬼眼刑警",
+      "episodes": 1,
+      "seconds": 5638,
+      "bytes_per_ep": 2939728886,
+      "bytes_total": 2939728886
+    },
+    {
+      "slug": "1861-Fathers-And-Sons",
+      "name": "爸爸閉翳",
+      "episodes": 25,
+      "seconds": 65644,
+      "bytes_per_ep": 715581031,
+      "bytes_total": 17889525775
+    },
+    {
+      "slug": "1874-In-The-Chamber-Of-Bliss",
+      "name": "蔡鍔與小鳳仙",
+      "episodes": 20,
+      "seconds": 52298,
+      "bytes_per_ep": 716333713,
+      "bytes_total": 14326674260
+    },
+    {
+      "slug": "1879-Hearts-Of-Fencing",
+      "name": "當四葉草碰上劍尖時",
+      "episodes": 11,
+      "seconds": 28619,
+      "bytes_per_ep": 711650214,
+      "bytes_total": 7828152354
+    },
+    {
+      "slug": "1895-Face-To-Fate",
+      "name": "布衣神相",
+      "episodes": 30,
+      "seconds": 78481,
+      "bytes_per_ep": 716525188,
+      "bytes_total": 21495755640
+    },
+    {
+      "slug": "1896-Love-Exchange",
+      "name": "疑情別戀",
+      "episodes": 20,
+      "seconds": 52209,
+      "bytes_per_ep": 715404523,
+      "bytes_total": 14308090460
+    },
+    {
+      "slug": "1899-Lets-Face-It",
+      "name": "無考不成冤家",
+      "episodes": 20,
+      "seconds": 53320,
+      "bytes_per_ep": 732012892,
+      "bytes_total": 14640257840
+    },
+    {
+      "slug": "1902-Not-Just-A-Pretty-Face",
+      "name": "美麗在望",
+      "episodes": 20,
+      "seconds": 53255,
+      "bytes_per_ep": 732350554,
+      "bytes_total": 14647011080
+    },
+    {
+      "slug": "1927-The-Green-Hope",
+      "name": "新鮮人",
+      "episodes": 25,
+      "seconds": 66696,
+      "bytes_per_ep": 729930165,
+      "bytes_total": 18248254125
+    },
+    {
+      "slug": "1931-The-Herbalists-Manual",
+      "name": "本草藥王",
+      "episodes": 25,
+      "seconds": 65441,
+      "bytes_per_ep": 717383357,
+      "bytes_total": 17934583925
+    },
+    {
+      "slug": "1972-Angels-Of-Mission",
+      "name": "無名天使3D",
+      "episodes": 20,
+      "seconds": 52835,
+      "bytes_per_ep": 724615970,
+      "bytes_total": 14492319400
+    },
+    {
+      "slug": "2005-Be-My-Guest-1",
+      "name": "志雲飯局",
+      "episodes": 80,
+      "seconds": 249857,
+      "bytes_per_ep": 871337552,
+      "bytes_total": 69707004160
+    },
+    {
+      "slug": "2021-Be-My-Guest-2",
+      "name": "志雲飯局",
+      "episodes": 79,
+      "seconds": 255153,
+      "bytes_per_ep": 840111687,
+      "bytes_total": 66368823273
+    },
+    {
+      "slug": "2063-Crimson-Sabre",
+      "name": "碧血劍",
+      "episodes": 35,
+      "seconds": 93882,
+      "bytes_per_ep": 737677512,
+      "bytes_total": 25818712920
+    },
+    {
+      "slug": "2088-Misleading-Track",
+      "name": "奪命真夫",
+      "episodes": 20,
+      "seconds": 52416,
+      "bytes_per_ep": 719769351,
+      "bytes_total": 14395387020
+    },
+    {
+      "slug": "2113-Just-Love",
+      "name": "老婆大人 ",
+      "episodes": 20,
+      "seconds": 52507,
+      "bytes_per_ep": 717205011,
+      "bytes_total": 14344100220
+    },
+    {
+      "slug": "2116-Return-Of-Judge-Bao-I",
+      "name": "包公出巡之龍鳳肚兜",
+      "episodes": 10,
+      "seconds": 27597,
+      "bytes_per_ep": 753611671,
+      "bytes_total": 7536116710
+    },
+    {
+      "slug": "2117-Return-Of-Judge-Bao-II",
+      "name": "包公出巡之夢迴青樓",
+      "episodes": 10,
+      "seconds": 27275,
+      "bytes_per_ep": 737527658,
+      "bytes_total": 7375276580
+    },
+    {
+      "slug": "2118-Return-Of-Judge-Bao-III",
+      "name": "包公出巡之明鏡高懸",
+      "episodes": 10,
+      "seconds": 27502,
+      "bytes_per_ep": 772221123,
+      "bytes_total": 7722211230
+    },
+    {
+      "slug": "2119-Return-Of-Judge-Bao-IV",
+      "name": "包公出巡之威震金陵",
+      "episodes": 10,
+      "seconds": 27560,
+      "bytes_per_ep": 763500793,
+      "bytes_total": 7635007930
+    },
+    {
+      "slug": "2146-MiMi-Mi-Wan-Ye-2008-Live",
+      "name": "咪咪“咪”玩嘢2008演唱會",
+      "episodes": 1,
+      "seconds": 8057,
+      "bytes_per_ep": 4210444585,
+      "bytes_total": 4210444585
+    },
+    {
+      "slug": "2158-Off-Pedder-1",
+      "name": "畢打自己人",
+      "episodes": 100,
+      "seconds": 134245,
+      "bytes_per_ep": 702898182,
+      "bytes_total": 70289818200
+    },
+    {
+      "slug": "2159-Off-Pedder-2",
+      "name": "畢打自己人",
+      "episodes": 100,
+      "seconds": 134106,
+      "bytes_per_ep": 699622002,
+      "bytes_total": 69962200200
+    },
+    {
+      "slug": "2160-Off-Pedder-3",
+      "name": "畢打自己人",
+      "episodes": 100,
+      "seconds": 134309,
+      "bytes_per_ep": 698532021,
+      "bytes_total": 69853202100
+    },
+    {
+      "slug": "2161-Off-Pedder-4",
+      "name": "畢打自己人",
+      "episodes": 38,
+      "seconds": 51012,
+      "bytes_per_ep": 707830598,
+      "bytes_total": 26897562724
+    },
+    {
+      "slug": "1712-Au-Revoir-Shanghai",
+      "name": "上海傳奇",
+      "episodes": 20,
+      "seconds": 52153,
+      "bytes_per_ep": 711898948,
+      "bytes_total": 14237978960
+    },
+    {
+      "slug": "1720-A-Matter-of-Customs",
+      "name": "雷霆第一關 ",
+      "episodes": 32,
+      "seconds": 84940,
+      "bytes_per_ep": 721380083,
+      "bytes_total": 23084162656
+    },
+    {
+      "slug": "1721-The-Conquerors-Story",
+      "name": "楚漢驕雄",
+      "episodes": 30,
+      "seconds": 78632,
+      "bytes_per_ep": 719256669,
+      "bytes_total": 21577700070
+    },
+    {
+      "slug": "1722-The-King-Of-Snooker",
+      "name": "The King Of Snooker",
+      "episodes": 20,
+      "seconds": 52313,
+      "bytes_per_ep": 1374430195,
+      "bytes_total": 27488603900
+    },
+    {
+      "slug": "1723-At-the-Threshold-of-An-Era-II",
+      "name": "At the Threshold of An Era II",
+      "episodes": 56,
+      "seconds": 149884,
+      "bytes_per_ep": 734881558,
+      "bytes_total": 41153367248
+    },
+    {
+      "slug": "1730-On-the-Track-or-Off",
+      "name": "勇往直前",
+      "episodes": 40,
+      "seconds": 106173,
+      "bytes_per_ep": 725469823,
+      "bytes_total": 29018792920
+    },
+    {
+      "slug": "1756-Love-Is-Beautiful",
+      "name": "無頭東宮",
+      "episodes": 30,
+      "seconds": 79388,
+      "bytes_per_ep": 703442260,
+      "bytes_total": 21103267800
+    },
+    {
+      "slug": "1757-The-Dance-of-Passion",
+      "name": "火舞黃沙",
+      "episodes": 32,
+      "seconds": 83839,
+      "bytes_per_ep": 717778156,
+      "bytes_total": 22968900992
+    },
+    {
+      "slug": "1764-The-Master-Of-Tai-Chi",
+      "name": "太極",
+      "episodes": 25,
+      "seconds": 65354,
+      "bytes_per_ep": 717234713,
+      "bytes_total": 17930867825
+    },
+    {
+      "slug": "1765-Bar-Bender",
+      "name": "潮爆大狀",
+      "episodes": 20,
+      "seconds": 52510,
+      "bytes_per_ep": 651152729,
+      "bytes_total": 13023054580
+    },
+    {
+      "slug": "1773-Love-Guaranteed",
+      "name": "愛情全保",
+      "episodes": 20,
+      "seconds": 52581,
+      "bytes_per_ep": 715719929,
+      "bytes_total": 14314398580
+    },
+    {
+      "slug": "1782-Screen-Play",
+      "name": "娛樂反斗星",
+      "episodes": 25,
+      "seconds": 66136,
+      "bytes_per_ep": 725732288,
+      "bytes_total": 18143307200
+    },
+    {
+      "slug": "1788-The-Winter-Melon-Tale",
+      "name": "大冬瓜",
+      "episodes": 20,
+      "seconds": 52365,
+      "bytes_per_ep": 717976395,
+      "bytes_total": 14359527900
+    },
+    {
+      "slug": "1789-Fly-With-Me",
+      "name": "飛女正傳",
+      "episodes": 25,
+      "seconds": 65306,
+      "bytes_per_ep": 713063238,
+      "bytes_total": 17826580950
+    },
+    {
+      "slug": "1795-The-Biter-Bitten",
+      "name": "人生馬戲團",
+      "episodes": 20,
+      "seconds": 52214,
+      "bytes_per_ep": 716174064,
+      "bytes_total": 14323481280
+    },
+    {
+      "slug": "1799-Riches-and-Stitches",
+      "name": "鳳舞香羅",
+      "episodes": 30,
+      "seconds": 75619,
+      "bytes_per_ep": 692967126,
+      "bytes_total": 20789013780
+    },
+    {
+      "slug": "1801-Aiming-High",
+      "name": "撻出愛火花",
+      "episodes": 20,
+      "seconds": 53824,
+      "bytes_per_ep": 673450795,
+      "bytes_total": 13469015900
+    },
+    {
+      "slug": "1806-To-Love-With-No-Regrets",
+      "name": "足秤老婆八兩夫",
+      "episodes": 20,
+      "seconds": 52974,
+      "bytes_per_ep": 727955203,
+      "bytes_total": 14559104060
+    },
+    {
+      "slug": "1807-The-Beauty-Of-The-Game",
+      "name": "美麗高解像",
+      "episodes": 20,
+      "seconds": 52424,
+      "bytes_per_ep": 718916651,
+      "bytes_total": 14378333020
+    },
+    {
+      "slug": "1814-Fantasy-Hotel",
+      "name": "開心賓館",
+      "episodes": 20,
+      "seconds": 52316,
+      "bytes_per_ep": 718227501,
+      "bytes_total": 14364550020
+    },
+    {
+      "slug": "1818-Legal-Entanglement",
+      "name": "法網伊人",
+      "episodes": 22,
+      "seconds": 58287,
+      "bytes_per_ep": 727426278,
+      "bytes_total": 16003378116
+    },
+    {
+      "slug": "1836-Aqua-Heroes",
+      "name": "戀愛自由式 ",
+      "episodes": 20,
+      "seconds": 50583,
+      "bytes_per_ep": 690305222,
+      "bytes_total": 13806104440
+    },
+    {
+      "slug": "1837-Just-Love-II",
+      "name": "老婆大人II ",
+      "episodes": 25,
+      "seconds": 65493,
+      "bytes_per_ep": 712992117,
+      "bytes_total": 17824802925
+    },
+    {
+      "slug": "1842-The-Gentle-Crackdown-II",
+      "name": "秀才愛上兵",
+      "episodes": 20,
+      "seconds": 52150,
+      "bytes_per_ep": 711621451,
+      "bytes_total": 14232429020
+    },
+    {
+      "slug": "1424-Revolving-Doors-of-Vengeance",
+      "name": "酒店風雲",
+      "episodes": 30,
+      "seconds": 74866,
+      "bytes_per_ep": 685323999,
+      "bytes_total": 20559719970
+    },
+    {
+      "slug": "1471-Wasabi-Mon-Amour",
+      "name": "Wasabi Mon Amour",
+      "episodes": 20,
+      "seconds": 52517,
+      "bytes_per_ep": 721689574,
+      "bytes_total": 14433791480
+    },
+    {
+      "slug": "1482-DIE-Again",
+      "name": "古靈精探B",
+      "episodes": 25,
+      "seconds": 65542,
+      "bytes_per_ep": 718235910,
+      "bytes_total": 17955897750
+    },
+    {
+      "slug": "1488-The-Building-Blocks-of-Life",
+      "name": "建築有情天",
+      "episodes": 20,
+      "seconds": 52365,
+      "bytes_per_ep": 716666724,
+      "bytes_total": 14333334480
+    },
+    {
+      "slug": "1541-The-Stew-Of-Life",
+      "name": "有營煮婦",
+      "episodes": 30,
+      "seconds": 78711,
+      "bytes_per_ep": 1375771826,
+      "bytes_total": 41273154780
+    },
+    {
+      "slug": "1553-Where-The-Legend-Begins",
+      "name": "洛神",
+      "episodes": 27,
+      "seconds": 71692,
+      "bytes_per_ep": 655605640,
+      "bytes_total": 17701352280
+    },
+    {
+      "slug": "1574-War-of-the-Genders",
+      "name": "男親女愛",
+      "episodes": 50,
+      "seconds": 120957,
+      "bytes_per_ep": 667765295,
+      "bytes_total": 33388264750
+    },
+    {
+      "slug": "1594-Police-Station-No-7",
+      "name": "七號差館",
+      "episodes": 25,
+      "seconds": 66425,
+      "bytes_per_ep": 730776250,
+      "bytes_total": 18269406250
+    },
+    {
+      "slug": "1597-Seven-Sisters",
+      "name": "七姊妹",
+      "episodes": 32,
+      "seconds": 84902,
+      "bytes_per_ep": 726724852,
+      "bytes_total": 23255195264
+    },
+    {
+      "slug": "1603-Survivors-Law-II",
+      "error": "playback 403 for 1764366709839214476: [\n  {\n    \"error_code\": \"VIDEO_NOT_PLAYABLE\",\n    \"message\": \"The policy key provided does not permit this account or vi"
+    },
+    {
+      "slug": "1625-The-Gem-Of-Life",
+      "name": "珠光寶氣",
+      "episodes": 82,
+      "seconds": 214564,
+      "bytes_per_ep": 716470886,
+      "bytes_total": 58750612652
+    },
+    {
+      "slug": "1632-The-Seventh-Day",
+      "name": "最美麗的第七天",
+      "episodes": 20,
+      "seconds": 52315,
+      "bytes_per_ep": 716537607,
+      "bytes_total": 14330752140
+    },
+    {
+      "slug": "1633-Twins-Of-Brothers",
+      "name": "大唐雙龍傳 (EN)",
+      "episodes": 42,
+      "seconds": 110870,
+      "bytes_per_ep": 725405634,
+      "bytes_total": 30467036628
+    },
+    {
+      "slug": "1635-Ten-Brothers",
+      "name": "十兄弟",
+      "episodes": 20,
+      "seconds": 52218,
+      "bytes_per_ep": 695272770,
+      "bytes_total": 13905455400
+    },
+    {
+      "slug": "1646-Law-Enforcers",
+      "name": "勇探實錄",
+      "episodes": 20,
+      "seconds": 52743,
+      "bytes_per_ep": 660667659,
+      "bytes_total": 13213353180
+    },
+    {
+      "slug": "1650-Club-Sparkle",
+      "name": "Club Sparkle",
+      "episodes": 26,
+      "seconds": 69817,
+      "bytes_per_ep": 735224524,
+      "bytes_total": 19115837624
+    },
+    {
+      "slug": "1652-Survivors-Law",
+      "name": "律政新人王",
+      "episodes": 25,
+      "seconds": 66137,
+      "bytes_per_ep": 663221664,
+      "bytes_total": 16580541600
+    },
+    {
+      "slug": "1654-Into-Thin-Air",
+      "name": "人間蒸發",
+      "episodes": 20,
+      "seconds": 52207,
+      "bytes_per_ep": 716949489,
+      "bytes_total": 14338989780
+    },
+    {
+      "slug": "1657-Food-For-Life",
+      "name": "Yummy Yummy",
+      "episodes": 30,
+      "seconds": 78760,
+      "bytes_per_ep": 720473434,
+      "bytes_total": 21614203020
+    },
+    {
+      "slug": "1676-Blade-Heart",
+      "name": "血薦軒轅",
+      "episodes": 42,
+      "seconds": 111170,
+      "bytes_per_ep": 722156338,
+      "bytes_total": 30330566196
+    },
+    {
+      "slug": "1691-La-Femme-Desperado",
+      "name": "女人唔易做 (EN)",
+      "episodes": 22,
+      "seconds": 57706,
+      "bytes_per_ep": 719812172,
+      "bytes_total": 15835867784
+    },
+    {
+      "slug": "1692-Reaching-Out",
+      "name": "美麗人生",
+      "episodes": 50,
+      "seconds": 133034,
+      "bytes_per_ep": 730586625,
+      "bytes_total": 36529331250
+    },
+    {
+      "slug": "1694-Leathal-Weapon-Of-Love-And-Passion",
+      "name": "覆雨翻雲 (EN)",
+      "episodes": 40,
+      "seconds": 104686,
+      "bytes_per_ep": 716015858,
+      "bytes_total": 28640634320
+    },
+    {
+      "slug": "1699-A-Herbalist-Affair",
+      "name": "情牽百子櫃",
+      "episodes": 20,
+      "seconds": 52981,
+      "bytes_per_ep": 658819609,
+      "bytes_total": 13176392180
+    },
+    {
+      "slug": "1158-When-Easterly-Showers-Fall-on-the-Sunny-West",
+      "name": "When Easterly Showers Fall On The Sunny West",
+      "episodes": 30,
+      "seconds": 78590,
+      "bytes_per_ep": 720546166,
+      "bytes_total": 21616384980
+    },
+    {
+      "slug": "1171-Family-Man",
+      "name": "絕世好爸",
+      "episodes": 20,
+      "seconds": 53676,
+      "bytes_per_ep": 734670143,
+      "bytes_total": 14693402860
+    },
+    {
+      "slug": "1175-On-The-First-Beat",
+      "name": "學警出更",
+      "episodes": 30,
+      "seconds": 78481,
+      "bytes_per_ep": 718743275,
+      "bytes_total": 21562298250
+    },
+    {
+      "slug": "1206-A-Chip-Off-The-Old-Block",
+      "name": "巴不得爸爸",
+      "episodes": 21,
+      "seconds": 55181,
+      "bytes_per_ep": 0,
+      "bytes_total": 0
+    },
+    {
+      "slug": "1220-Healing-Hands-II",
+      "name": "妙手仁心 II",
+      "episodes": 40,
+      "seconds": 105160,
+      "bytes_per_ep": 715151699,
+      "bytes_total": 28606067960
+    },
+    {
+      "slug": "1233-Point-Of-No-Return",
+      "name": "Point Of No Return",
+      "episodes": 30,
+      "seconds": 79618,
+      "bytes_per_ep": 660105527,
+      "bytes_total": 19803165810
+    },
+    {
+      "slug": "1234-To-Get-Unstuck-In-Time",
+      "name": "隔世追凶",
+      "episodes": 22,
+      "seconds": 58184,
+      "bytes_per_ep": 728395390,
+      "bytes_total": 16024698580
+    },
+    {
+      "slug": "1252-My-Family",
+      "name": "甜酸爺爺",
+      "episodes": 20,
+      "seconds": 52513,
+      "bytes_per_ep": 722501618,
+      "bytes_total": 14450032360
+    },
+    {
+      "slug": "1280-Vitures-Of-Harmony",
+      "name": "皆大歡喜",
+      "episodes": 164,
+      "seconds": 451328,
+      "bytes_per_ep": 779192747,
+      "bytes_total": 127787610508
+    },
+    {
+      "slug": "1281-The-Gentle-Crackdown",
+      "name": "秀才遇著兵",
+      "episodes": 20,
+      "seconds": 52485,
+      "bytes_per_ep": 717984181,
+      "bytes_total": 14359683620
+    },
+    {
+      "slug": "1285-Youre-Hired",
+      "name": "絕代商驕",
+      "episodes": 22,
+      "seconds": 57599,
+      "bytes_per_ep": 1364617841,
+      "bytes_total": 30021592502
+    },
+    {
+      "slug": "1292-Virtues-Of-Harmony-2",
+      "name": "皆大歡喜",
+      "episodes": 74,
+      "seconds": 208992,
+      "bytes_per_ep": 801246577,
+      "bytes_total": 59292246698
+    },
+    {
+      "slug": "1348-Gods-of-Honour",
+      "name": "封神榜",
+      "episodes": 40,
+      "seconds": 101064,
+      "bytes_per_ep": 692028531,
+      "bytes_total": 27681141240
+    },
+    {
+      "slug": "1356-The-Charm-Beneath",
+      "name": "胭脂水粉",
+      "episodes": 30,
+      "seconds": 78796,
+      "bytes_per_ep": 720901710,
+      "bytes_total": 21627051300
+    },
+    {
+      "slug": "1358-A-Watchdogs-Tale",
+      "name": "老友狗狗",
+      "episodes": 20,
+      "seconds": 52600,
+      "bytes_per_ep": 0,
+      "bytes_total": 0
+    },
+    {
+      "slug": "1374-Forensic-Heroes-II",
+      "name": "法証先鋒II",
+      "episodes": 30,
+      "seconds": 78457,
+      "bytes_per_ep": 714573187,
+      "bytes_total": 21437195610
+    },
+    {
+      "slug": "1380-Wars-of-InLaws-II",
+      "name": "野蠻奶奶大戰戈師奶",
+      "episodes": 20,
+      "seconds": 52488,
+      "bytes_per_ep": 1370254486,
+      "bytes_total": 27405089720
+    },
+    {
+      "slug": "1408-The-Silver-Chamber-Of-Sorrows",
+      "name": "銀樓金粉",
+      "episodes": 21,
+      "seconds": 54931,
+      "bytes_per_ep": 1378786060,
+      "bytes_total": 28954507260
+    },
+    {
+      "slug": "1410-Last-One-Standing",
+      "name": "與敵同行",
+      "episodes": 22,
+      "seconds": 57735,
+      "bytes_per_ep": 1376320954,
+      "bytes_total": 30279060988
+    },
+    {
+      "slug": "1412-The-Greatness-of-a-Hero",
+      "name": "盛世仁傑",
+      "episodes": 20,
+      "seconds": 52418,
+      "bytes_per_ep": 717381841,
+      "bytes_total": 14347636820
+    },
+    {
+      "slug": "1415-Welcome-to-the-House-1",
+      "name": "高朋滿座",
+      "episodes": 80,
+      "seconds": 107450,
+      "bytes_per_ep": 355592578,
+      "bytes_total": 28447406240
+    },
+    {
+      "slug": "1416-Welcome-to-the-House-2",
+      "name": "高朋滿座",
+      "episodes": 80,
+      "seconds": 107380,
+      "bytes_per_ep": 357027071,
+      "bytes_total": 28562165680
+    },
+    {
+      "slug": "1417-Welcome-to-the-House-3",
+      "name": "高朋滿座",
+      "episodes": 79,
+      "seconds": 106233,
+      "bytes_per_ep": 357559888,
+      "bytes_total": 28247231152
+    },
+    {
+      "slug": "1420-Legend-of-the-Demigods",
+      "name": "搜神傳",
+      "episodes": 22,
+      "seconds": 57451,
+      "bytes_per_ep": 1048759739,
+      "bytes_total": 23072714258
+    },
+    {
+      "slug": "1000-Square-Pegs",
+      "name": "戇夫成龍",
+      "episodes": 20,
+      "seconds": 52914,
+      "bytes_per_ep": 714723439,
+      "bytes_total": 14294468780
+    },
+    {
+      "slug": "1001-Life-Made-Simple",
+      "name": "阿旺新傳",
+      "episodes": 32,
+      "seconds": 83788,
+      "bytes_per_ep": 0,
+      "bytes_total": 0
+    },
+    {
+      "slug": "1018-The-Last-Breakthrough",
+      "name": "天涯俠醫",
+      "episodes": 30,
+      "seconds": 78548,
+      "bytes_per_ep": 0,
+      "bytes_total": 0
+    },
+    {
+      "slug": "1028-The-Awakening-Story",
+      "name": "婚前昏後",
+      "episodes": 25,
+      "seconds": 66415,
+      "bytes_per_ep": 0,
+      "bytes_total": 0
+    },
+    {
+      "slug": "1029-Lady-Fan",
+      "name": "烽火奇遇結良緣",
+      "episodes": 20,
+      "seconds": 53035,
+      "bytes_per_ep": 0,
+      "bytes_total": 0
+    },
+    {
+      "slug": "1033-The-Brink-Of-Law",
+      "name": "突圍行動",
+      "episodes": 25,
+      "seconds": 65515,
+      "bytes_per_ep": 715371245,
+      "bytes_total": 17884281125
+    },
+    {
+      "slug": "1041-Always-Ready",
+      "name": "隨時候命",
+      "episodes": 30,
+      "seconds": 79134,
+      "bytes_per_ep": 0,
+      "bytes_total": 0
+    },
+    {
+      "slug": "1049-The-W-File",
+      "name": "衛斯理",
+      "episodes": 30,
+      "seconds": 79409,
+      "bytes_per_ep": 0,
+      "bytes_total": 0
+    },
+    {
+      "slug": "1075-Wars-Of-InLaws",
+      "name": "我的野蠻奶奶",
+      "episodes": 20,
+      "seconds": 52466,
+      "bytes_per_ep": 719984351,
+      "bytes_total": 14399687020
+    },
+    {
+      "slug": "1082-Glittering-Days",
+      "name": "東方之珠",
+      "episodes": 30,
+      "seconds": 78620,
+      "bytes_per_ep": 877895785,
+      "bytes_total": 26336873550
+    },
+    {
+      "slug": "1086-A-Journey-Called-Life",
+      "name": "金石良緣",
+      "episodes": 20,
+      "seconds": 52471,
+      "bytes_per_ep": 0,
+      "bytes_total": 0
+    },
+    {
+      "slug": "1091-Steps",
+      "name": "舞動全城",
+      "episodes": 20,
+      "seconds": 52842,
+      "bytes_per_ep": 0,
+      "bytes_total": 0
+    },
+    {
+      "slug": "1092-Happy-Ever-After",
+      "name": "金玉滿堂",
+      "episodes": 40,
+      "seconds": 107383,
+      "bytes_per_ep": 730042729,
+      "bytes_total": 29201709160
+    },
+    {
+      "slug": "1110-Maidens-Vow",
+      "name": "Maidens&#x27; Vow",
+      "episodes": 30,
+      "seconds": 78572,
+      "bytes_per_ep": 0,
+      "bytes_total": 0
+    },
+    {
+      "slug": "1113-The-Threat-of-Love-II",
+      "name": "Loving You 我愛你 2",
+      "episodes": 10,
+      "seconds": 25838,
+      "bytes_per_ep": 0,
+      "bytes_total": 0
+    },
+    {
+      "slug": "892-The-Academy",
+      "name": "學警雄心",
+      "episodes": 32,
+      "seconds": 83882,
+      "bytes_per_ep": 0,
+      "bytes_total": 0
+    },
+    {
+      "slug": "893-War-And-Beauty",
+      "name": "金枝慾孽",
+      "episodes": 30,
+      "seconds": 79502,
+      "bytes_per_ep": 0,
+      "bytes_total": 0
+    },
+    {
+      "slug": "903-A-Pillow-Case-of-Mystery",
+      "name": "施公奇案",
+      "episodes": 20,
+      "seconds": 52490,
+      "bytes_per_ep": 1037475054,
+      "bytes_total": 20749501080
+    },
+    {
+      "slug": "928-Return-Of-The-Cuckoo",
+      "name": "澳門街",
+      "episodes": 20,
+      "seconds": 53691,
+      "bytes_per_ep": 737598059,
+      "bytes_total": 14751961180
+    },
+    {
+      "slug": "930-A-Change-Of-Destiny",
+      "name": "天機算",
+      "episodes": 20,
+      "seconds": 52406,
+      "bytes_per_ep": 0,
+      "bytes_total": 0
+    },
+    {
+      "slug": "939-Growing-Through-Life",
+      "name": "Growing Through Life",
+      "episodes": 30,
+      "seconds": 78473,
+      "bytes_per_ep": 0,
+      "bytes_total": 0
+    },
+    {
+      "slug": "962-When-A-Dog-Loves-A-Cat",
+      "name": "當狗愛上貓",
+      "episodes": 20,
+      "seconds": 52371,
+      "bytes_per_ep": 717066732,
+      "bytes_total": 14341334640
+    },
+    {
+      "slug": "963-Word-Twisters-Adventures",
+      "name": "鐵咀銀牙 (EN)",
+      "episodes": 20,
+      "seconds": 52286,
+      "bytes_per_ep": 718738129,
+      "bytes_total": 14374762580
+    },
+    {
+      "slug": "972-The-White-Flames",
+      "name": "紅衣手記",
+      "episodes": 20,
+      "seconds": 53039,
+      "bytes_per_ep": 0,
+      "bytes_total": 0
+    },
+    {
+      "slug": "590-Triumph-in-the-Skies",
+      "name": "Triumph In The Skies",
+      "episodes": 40,
+      "seconds": 106140,
+      "bytes_per_ep": 0,
+      "bytes_total": 0
+    },
+    {
+      "slug": "594-Forensic-Heroes",
+      "name": "Forensic Heroes",
+      "episodes": 25,
+      "seconds": 65550,
+      "bytes_per_ep": 719727199,
+      "bytes_total": 17993179975
+    },
+    {
+      "slug": "595-Dicey-Business",
+      "name": "賭場風雲 (EN)",
+      "episodes": 35,
+      "seconds": 91747,
+      "bytes_per_ep": 715900191,
+      "bytes_total": 25056506685
+    },
+    {
+      "slug": "597-Heart-Of-Greed",
+      "name": "Heart Of Greed",
+      "episodes": 40,
+      "seconds": 104765,
+      "bytes_per_ep": 0,
+      "bytes_total": 0
+    },
+    {
+      "slug": "598-Men-Dont-Cry",
+      "error": "playback 403 for 1788547612395029903: [\n  {\n    \"error_code\": \"VIDEO_NOT_PLAYABLE\",\n    \"message\": \"The policy key provided does not permit this account or vi"
+    },
+    {
+      "slug": "601-Your-Class-Or-Mine",
+      "name": "尖子攻略",
+      "episodes": 20,
+      "seconds": 52408,
+      "bytes_per_ep": 0,
+      "bytes_total": 0
+    },
+    {
+      "slug": "698-The-Voice",
+      "name": "超級巨聲",
+      "episodes": 29,
+      "seconds": 110730,
+      "bytes_per_ep": 1069428936,
+      "bytes_total": 31013439144
+    },
+    {
+      "slug": "730-DIE",
+      "name": "D.I.E.",
+      "episodes": 25,
+      "seconds": 65551,
+      "bytes_per_ep": 0,
+      "bytes_total": 0
+    },
+    {
+      "slug": "733-The-King-Of-Yesterday-And-Tomorrow",
+      "error": "playback 403 for 6008522421001: [\n  {\n    \"error_code\": \"VIDEO_NOT_PLAYABLE\",\n    \"message\": \"The policy key provided does not permit this account or vi"
+    },
+    {
+      "slug": "771-Witness-To-A-Prosecution-II",
+      "name": "洗冤錄 II",
+      "episodes": 22,
+      "seconds": 58630,
+      "bytes_per_ep": 0,
+      "bytes_total": 0
+    },
+    {
+      "slug": "773-Armed-Reaction-II",
+      "name": "陀槍師姐II",
+      "episodes": 32,
+      "seconds": 85671,
+      "bytes_per_ep": 0,
+      "bytes_total": 0
+    },
+    {
+      "slug": "775-Armed-Reaction-III",
+      "name": "陀槍師姐 III",
+      "episodes": 32,
+      "seconds": 84731,
+      "bytes_per_ep": 0,
+      "bytes_total": 0
+    },
+    {
+      "slug": "776-Armed-Reaction-IV",
+      "name": "陀槍師姐 IV",
+      "episodes": 40,
+      "seconds": 105912,
+      "bytes_per_ep": 0,
+      "bytes_total": 0
+    },
+    {
+      "slug": "782-Born-Rich",
+      "name": "Born Rich",
+      "episodes": 41,
+      "seconds": 107344,
+      "bytes_per_ep": 0,
+      "bytes_total": 0
+    },
+    {
+      "slug": "800-Beautiful-Cooking-Sr-2",
+      "name": "美女廚房 2",
+      "episodes": 28,
+      "seconds": 79664,
+      "bytes_per_ep": 0,
+      "bytes_total": 0
+    },
+    {
+      "slug": "816-The-Four",
+      "name": "The Four",
+      "episodes": 25,
+      "seconds": 65410,
+      "bytes_per_ep": 0,
+      "bytes_total": 0
+    },
+    {
+      "slug": "818-Minutes-To-Fame-Sr-2",
+      "name": "殘酷一叮 2",
+      "episodes": 16,
+      "seconds": 21914,
+      "bytes_per_ep": 0,
+      "bytes_total": 0
+    },
+    {
+      "slug": "826-Under-The-Canopy-Of-Love",
+      "name": "Under the Canopy of Love",
+      "episodes": 20,
+      "seconds": 52656,
+      "bytes_per_ep": 654543491,
+      "bytes_total": 13090869820
+    },
+    {
+      "slug": "837-Minutes-to-Fame-Sr3",
+      "name": "殘酷一叮3",
+      "episodes": 17,
+      "seconds": 23868,
+      "bytes_per_ep": 0,
+      "bytes_total": 0
+    },
+    {
+      "slug": "849-To-Catch-The-Uncatchable",
+      "name": "棟篤神探",
+      "episodes": 25,
+      "seconds": 66224,
+      "bytes_per_ep": 720561151,
+      "bytes_total": 18014028775
+    },
+    {
+      "slug": "850-A-Taste-of-Love",
+      "name": "美味情緣",
+      "episodes": 25,
+      "seconds": 66327,
+      "bytes_per_ep": 0,
+      "bytes_total": 0
+    },
+    {
+      "slug": "880-Ups-and-Downs-In-the-Sea-of-Love",
+      "name": "十萬噸情緣",
+      "episodes": 20,
+      "seconds": 53015,
+      "bytes_per_ep": 0,
+      "bytes_total": 0
+    },
+    {
+      "slug": "887-Dressage-To-Win",
+      "name": "Dressage To Win",
+      "episodes": 9,
+      "seconds": 13860,
+      "bytes_per_ep": 0,
+      "bytes_total": 0
+    },
+    {
+      "slug": "891-EU",
+      "name": "學警狙擊 (EN)",
+      "episodes": 30,
+      "seconds": 78668,
+      "bytes_per_ep": 1362911818,
+      "bytes_total": 40887354540
+    },
+    {
+      "slug": "432-Beautiful-Cooking",
+      "name": "美女廚房",
+      "episodes": 19,
+      "seconds": 50389,
+      "bytes_per_ep": 0,
+      "bytes_total": 0
+    },
+    {
+      "slug": "433-Minutes-To-Fame",
+      "name": "殘酷一叮",
+      "episodes": 18,
+      "seconds": 27007,
+      "bytes_per_ep": 0,
+      "bytes_total": 0
+    },
+    {
+      "slug": "439-Super-Trio-Show-Sr2",
+      "name": "Super Trio Show (Sr.2)",
+      "episodes": 16,
+      "seconds": 41187,
+      "bytes_per_ep": 0,
+      "bytes_total": 0
+    },
+    {
+      "slug": "440-Super-Trio-Supreme",
+      "name": "Super Trio Supreme",
+      "episodes": 45,
+      "seconds": 118533,
+      "bytes_per_ep": 0,
+      "bytes_total": 0
+    },
+    {
+      "slug": "512-A-Step-Into-The-Past",
+      "name": "尋秦記",
+      "episodes": 40,
+      "seconds": 106076,
+      "bytes_per_ep": 0,
+      "bytes_total": 0
+    },
+    {
+      "slug": "535-The-Heaven-Sword-And-The-Dragon-Sabre-2000",
+      "error": "empty playlist"
+    },
+    {
+      "slug": "546-Moonlight-Resonance",
+      "name": "Moonlight Resonance",
+      "episodes": 40,
+      "seconds": 104739,
+      "bytes_per_ep": 0,
+      "bytes_total": 0
+    },
+    {
+      "slug": "552-Burning-Flame-II",
+      "name": "烈火雄心 II",
+      "episodes": 35,
+      "seconds": 92742,
+      "bytes_per_ep": 0,
+      "bytes_total": 0
+    },
+    {
+      "slug": "553-Burning-Flame-III",
+      "name": "烈火雄心3",
+      "episodes": 32,
+      "seconds": 83858,
+      "bytes_per_ep": 0,
+      "bytes_total": 0
+    },
+    {
+      "slug": "572-Beyond-The-Realm-Of-Conscience",
+      "name": "Beyond The Realm Of Conscience",
+      "episodes": 33,
+      "seconds": 86433,
+      "bytes_per_ep": 0,
+      "bytes_total": 0
+    },
+    {
+      "slug": "574-Rosy-Business",
+      "name": "Rosy Business",
+      "episodes": 25,
+      "seconds": 65479,
+      "bytes_per_ep": 0,
+      "bytes_total": 0
+    }
+  ]
+}

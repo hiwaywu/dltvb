@@ -1,0 +1,31 @@
+# downloaded media — never commit this
+downloads/
+*.mp4
+*.ts
+*.part
+*.part.mp4
+*.m3u8
+*.vtt
+*.srt
+
+# runtime state / caches
+.state/
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# generated link dumps (URLs carry short-lived signed tokens — regenerate with `links`)
+links-*.json
+ocr_test.json
+
+# node scratch from browser tooling
+node_modules/
+package.json
+package-lock.json
+
+# editors / OS
+.vscode/
+.idea/
+Thumbs.db
+desktop.ini

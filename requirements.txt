@@ -1,0 +1,8 @@
+# Runtime deps. Python 3.10+.
+#   pip install -r requirements.txt
+requests>=2.31          # both tools
+cryptography>=42        # aidrama.py only (AES-128 HLS segments)
+
+# System deps (not pip):
+#   ffmpeg  — required for HLS-only titles (tvbaw) and remux/decrypt (aidrama), subtitle muxing
+#   ffprobe — ships with ffmpeg; used to verify the downloaded resolution

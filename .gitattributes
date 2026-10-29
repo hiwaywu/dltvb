@@ -1,0 +1,7 @@
+# normalise line endings so the repo behaves the same on every OS
+* text=auto eol=lf
+
+*.py    text eol=lf
+*.md    text eol=lf
+*.json  text eol=lf
+*.txt   text eol=lf
