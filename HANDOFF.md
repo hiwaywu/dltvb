@@ -165,7 +165,7 @@ python hardsub.py all "downloads\<series>\<episode>.mp4"        # full episode
 python hardsub.py all "…\001 Episode 01.mp4" --start 0 --end 700  # a slice, for a quality check
 ```
 
-Produces `<video>.zh.srt` (OCR'd Chinese) and `<video>.en.srt` (English).
+Produces `<video>.raw-ocr.zh.srt` (straight OCR), `<video>.zh.srt` (after the cleanup rules) and `<video>.en.srt` (English).
 
 Stage by stage, if you need them separately:
 
@@ -178,11 +178,13 @@ python hardsub.py translate  x.zh.srt -o x.en.srt
 ### How it works (and why in this order)
 
 1. **ffmpeg crops the subtitle band** — bottom 30% (`crop=iw:ih*0.30:0:ih*0.68`) and emits frames at 1 fps. Nothing else is decoded.
-2. **Row-ink profile finds the text lines** in each frame (`line_bands`) — no CNN detector. This is the single most important optimisation: running the PP-OCR *detector* on every frame costs **~1000 ms/frame** (≈90 min per episode). Splitting lines by brightness and calling the *recogniser* only costs **~30 ms/frame** (≈60–90 s per episode). **Never put the detector back in the loop.**
+2. **Glyph mask + row profile finds the text lines** in each frame (`glyph_mask`, `line_bands`) — no CNN detector. The mask keeps only bright pixels next to a black outline, in stroke-sized blobs, so white cups/shirts/lamps no longer create phantom lines; the **bottom** two lines are read, each cropped tightly to its text. (The old plain-brightness version took the *top* two bands and routinely dropped the real second subtitle line.) The two lines are kept as separate words (space-joined), not glued into one run-on sentence. This is the single most important optimisation: running the PP-OCR *detector* on every frame costs **~1000 ms/frame** (≈90 min per episode). Splitting lines by brightness and calling the *recogniser* only costs **~30 ms/frame** (≈60–90 s per episode). **Never put the detector back in the loop.**
 3. **Junk filter** (`is_junk`) drops signage/credits: pure-latin or numeric fragments, and 1–2 glyph cues that flash by in under 1.5 s. Measured: removed 9 of 91 cues (10%) with no loss of dialogue.
 4. **Temporal voting** (`group`) — the same subtitle persists across 4–8 frames; the most frequent reading in the cue wins, which removes random single-frame slips.
-5. **Cleanup pass** (`cleanup_srt`) — a confusion table of systematic misreads, then OpenCC `s2t` to force consistent Traditional Chinese. Measured: **58 of 82 lines repaired**.
-6. **Translate** — public Google endpoint (`translate.googleapis.com/translate_a/single?client=gtx`), no API key, ~0.1 s/cue.
+5. **Cleanup pass** (`cleanup_srt`) — `CONFUSIONS`, then OpenCC `s2t`, then `TRAD_CONFUSIONS` (rules written in Traditional only: 追→這, 度→麼, 遺→還, 逼→過, 實→買, 翰/韓→幹 …, with exclusions for real words like 追求/遺產/證實).
+6. **Translate** — public Google endpoint (`translate.googleapis.com/translate_a/single?client=gtx`), no API key. Source pinned to `zh-TW` (`auto` misdetected short cues), cues sent **newline-joined in batches by POST** (~1500 chars each); falls back to per-cue if the line count comes back different. ~1–3 s per episode instead of ~90 s.
+
+Measured on 生死訟 ep 2, 0–10 min, 16 random cues checked against the frames: Chinese exactly right **8/16 (was ~3/16, plus 3 cues missing)**; English carries the right meaning ~12/16. OCR 21 ms/frame (was 39). The red-calligraphy theme-song lyrics are no longer picked up (they were nonsense before anyway).
 
 ### The confusion table is the secret sauce
 
@@ -246,7 +248,7 @@ Keep raw and cleaned versions distinguishable (`…raw-ocr.zh.srt` vs `.zh.srt`)
 |---|---|
 | OCR (30 ms/frame @ 1 fps) | 60–90 s |
 | cleanup | instant |
-| translate (~360 cues) | ~40 s |
+| translate (~360 cues, batched) | ~3 s |
 | **total** | **~2–3 min** |
 
 All 25 episodes ≈ **1–1.5 hours**.
