@@ -51,6 +51,9 @@ _local = threading.local()
 _pk_lock = threading.Lock()
 _policy_key: str | None = None
 
+# "both" = "English Title - 中文名", "en" = English only, "native" = original behaviour
+_NAME_STYLE = "both"
+
 
 # --------------------------------------------------------------------------- http
 def session() -> requests.Session:
@@ -152,6 +155,8 @@ def resolve_series(ref: str) -> dict:
         "slug": slug,
         "url": final,
         "name": series_name,
+        "en_name": english_title(slug),
+        "year": series_year(html),
         "title": title,
         "bcov_ids": bcov_ids,
         "default_bcov": next(iter(bcov_ids.values()), ""),
@@ -184,7 +189,49 @@ def episodes(ref: str, lang: str | None = None) -> tuple[dict, list[dict]]:
     return info, info["episodes"]
 
 
-def ep_label(ep: dict, idx: int) -> str:
+def english_title(slug: str) -> str:
+    """'2906-The-Intangible-Truth' -> 'The Intangible Truth'."""
+    s = re.sub(r"^\d+-", "", slug or "")
+    s = s.replace("_", " ").replace("-", " ")
+    return re.sub(r"\s+", " ", s).strip() or (slug or "")
+
+
+def display_name(en: str, native: str, year: str = "", style: str | None = None) -> str:
+    """Folder naming: 'English Name - Chinese Name - Year'."""
+    style = style or _NAME_STYLE
+    native = (native or "").strip()
+    en = (en or "").strip()
+    year = (year or "").strip()
+    if style == "native" or not en:
+        base = native or en
+    elif style == "en" or not native or native == en:
+        base = en
+    else:
+        base = f"{en} - {native}"
+    return f"{base} - {year}" if year else base
+
+
+def series_year(html: str) -> str:
+    """Air year from the series JSON-LD, falling back to the browse-year chip."""
+    m = re.search(r'"datePublished"\s*:\s*"(\d{4})"', html)
+    if not m:
+        m = re.search(r'href="/en/browse\?year=(\d{4})"', html)
+    return m.group(1) if m else ""
+
+
+EPNUM_RE = re.compile(r"^第\s*0*(\d+)\s*[集話话]$")
+
+
+def episode_title_en(raw: str) -> str:
+    """'第01集' -> 'Episode 01'; leaves real titles untouched."""
+    m = EPNUM_RE.match((raw or "").strip())
+    if m:
+        return f"Episode {int(m.group(1)):02d}"
+    return raw
+
+
+def ep_label(ep: dict, idx: int, style: str | None = None) -> str:
+    style = style or _NAME_STYLE
     cf = ep.get("custom_fields") or {}
     num = cf.get("episode_number") or str(idx)
     try:
@@ -192,6 +239,12 @@ def ep_label(ep: dict, idx: int) -> str:
     except (TypeError, ValueError):
         pass
     name = (cf.get("title_chi") or ep.get("name") or f"ep{num}").strip()
+    if style != "native":
+        en = episode_title_en(name)
+        if style == "both" and en != name:
+            return f"{num} {en}"
+        if style == "en":
+            return f"{num} {en}"
     return f"{num} {name}"
 
 
@@ -598,13 +651,24 @@ def hms(sec: int) -> str:
     return f"{sec // 60}:{sec % 60:02d}"
 
 
+def series_dir(info: dict, outdir: str) -> str:
+    """downloads/<English Title - 中文名 (YYYY)>"""
+    return os.path.join(outdir, safe(display_name(
+        info.get("en_name"), info.get("name"), info.get("year"))))
+
+
+def series_label(info: dict) -> str:
+    return display_name(info.get("en_name"), info.get("name"), info.get("year"))
+
+
 # ---------------------------------------------------------------- commands
 def cmd_series(args) -> None:
     info, eps = episodes(args.ref, args.lang)
-    print(f"{info['name']}  [{info['lang']}]  id={info['id']}")
+    print(f"{series_label(info)}  [{info['lang']}]  id={info['id']}")
     print(f"  url         {info['url']}")
     print(f"  playlist    {info['playlist_id']}   languages: {', '.join(info['bcov_ids'])}")
     print(f"  episodes    {len(eps)}")
+    print(f"  folder      {series_dir(info, args.outdir)}")
     print()
     for i, ep in enumerate(eps, 1):
         print(f"  {ep_label(ep, i):<22} {hms(duration_s(ep)):>6}  {ep['id']}")
@@ -646,7 +710,7 @@ def cmd_links(args) -> None:
 def cmd_dl(args) -> None:
     info, eps = episodes(args.ref, args.lang)
     sel = parse_sel(args.episodes, len(eps))
-    root = os.path.join(args.outdir, safe(info["name"]))
+    root = series_dir(info, args.outdir)
     os.makedirs(root, exist_ok=True)
 
     print(f"{info['name']}  [{info['lang']}]")
@@ -729,7 +793,7 @@ def cmd_dl(args) -> None:
 def cmd_subs(args) -> None:
     info, eps = episodes(args.ref, args.lang)
     sel = parse_sel(args.episodes, len(eps))
-    root = os.path.join(args.outdir, safe(info["name"]))
+    root = series_dir(info, args.outdir)
     os.makedirs(root, exist_ok=True)
     print(f"{info['name']}  [{info['lang']}]  subtitles -> {root}")
     ok, none = 0, []
@@ -774,6 +838,9 @@ def main() -> None:
     def common(sp, ep=True):
         sp.add_argument("ref", help="series id, id-slug, or any site URL")
         sp.add_argument("--lang", help="language playlist key (e.g. tc)")
+        sp.add_argument("--name", choices=("both", "en", "native"), default="both",
+                        help="title style: 'both' = 'English - 中文 (YYYY)' (default)")
+        sp.add_argument("-o", "--outdir", default="downloads")
         if ep:
             sp.add_argument("-e", "--episodes", default="",
                             help="episode selection, e.g. 1-10,15 (default all)")
@@ -791,22 +858,23 @@ def main() -> None:
 
     sp = sub.add_parser("dl", help="download")
     common(sp)
-    sp.add_argument("-o", "--outdir", default="downloads")
     sp.add_argument("-c", "--conns", type=int, default=8, help="connections per episode")
     sp.add_argument("-j", "--jobs", type=int, default=3, help="episodes in parallel")
     sp.add_argument("--force", action="store_true")
     sp.add_argument("--retry-failed", action="store_true")
-    sp.add_argument("--subs", action="store_true", help="also fetch caption tracks (.vtt)")
-    sp.add_argument("--mux", action="store_true", help="embed subs as soft tracks")
+    sp.add_argument("--no-subs", dest="subs", action="store_false",
+                    help="skip caption tracks (default: ALWAYS fetch)")
+    sp.add_argument("--no-mux", dest="mux", action="store_false",
+                    help="keep captions as sidecar .vtt only, don't embed")
     sp.add_argument("--source", choices=("auto", "mp4", "hls"), default="auto",
                     help="source selection (default auto = highest resolution)")
-    sp.set_defaults(func=cmd_dl)
+    sp.set_defaults(func=cmd_dl, subs=True, mux=True)
 
     sp = sub.add_parser("subs", help="fetch subtitle tracks for a series")
     common(sp)
-    sp.add_argument("-o", "--outdir", default="downloads")
-    sp.add_argument("--mux", action="store_true", help="embed into existing mp4")
-    sp.set_defaults(func=cmd_subs)
+    sp.add_argument("--no-mux", dest="mux", action="store_false",
+                    help="keep .vtt sidecars only, don't embed into existing mp4")
+    sp.set_defaults(func=cmd_subs, mux=True)
 
     sp = sub.add_parser("browse", help="list series on a browse page")
     sp.add_argument("url")
@@ -814,6 +882,8 @@ def main() -> None:
     sp.set_defaults(func=cmd_browse)
 
     args = p.parse_args()
+    global _NAME_STYLE
+    _NAME_STYLE = getattr(args, "name", "both")
     try:
         args.func(args)
     except KeyboardInterrupt:

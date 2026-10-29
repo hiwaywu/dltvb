@@ -1,45 +1,3 @@
-# dltvb
-
-Downloaders for two Asian-drama streaming sites, both built by reverse-engineering
-the player chain rather than scraping HTML.
-
-| Tool | Site | Pipeline | Ceiling | Speed |
-|---|---|---|---|---|
-| `tvbaw.py` | `tvbanywherena.com` | Brightcove playlist → playback API → progressive MP4 (ranged, 8 connections) | up to 1920×1080 | ~32–35 MB/s |
-| `aidrama.py` | `aidrama.me` | WordPress REST → videoss API → AES-128 HLS (decrypt + remux) | 854×480 | ~19 MB/s |
-
-Both auto-select the highest-quality source available; neither needs a login.
-
-## Quick start
-
-```powershell
-pip install -r requirements.txt        # requests, cryptography
-# ffmpeg must be on PATH
-
-python tvbaw.py series 3751                        # inspect: episode count, languages, ids
-python tvbaw.py dl 3751 -c 8 -j 3 --subs --mux     # whole series, best quality, with subtitles
-python aidrama.py dl "https://aidrama.me/<series>/" -c 16 -j 2
-```
-
-Output lands in `downloads/<series name>/<NNN> <episode title>.mp4`, with matching
-`.vtt` sidecars when the title has caption tracks (also embedded when `--mux` is used).
-
-## Repo layout
-
-| File | Purpose |
-|---|---|
-| `tvbaw.py` | TVBAnywhere downloader — `series`, `links`, `dl`, `subs`, `browse` |
-| `aidrama.py` | aidrama.me downloader — `series`, `links`, `dl` |
-| `estimate_category.py` | sizes up a whole browse category (shows/episodes/TB) before committing |
-| `HANDOFF.md` | runbook for the next agent/operator: paste a link → one command |
-| `README.md` | this file; the detailed protocol notes for both sites |
-| `estimate_2000s.json` | sample output: all 227 shows in the 2000s category (≈4.2 TB) |
-
-Not committed: `downloads/`, `.state/` (cached policy key), generated `links-*.json`
-(those URLs carry short-lived signed tokens — regenerate them).
-
----
-
 # tvbaw — TVBAnywhere North America downloader
 
 Scratch-built tool for `tvbanywherena.com`. Resolves a series to **all** episode
@@ -80,18 +38,30 @@ python tvbaw.py series "https://tvbanywherena.com/en/watch/2321-Hong-Kong-86/173
 python tvbaw.py links 2321 --out links-2321.json
 python tvbaw.py links 2321 --print-urls        # pipe into curl/aria2/IDM
 
-# download
+# download — best quality and subtitles are automatic
 python tvbaw.py dl 2321                        # whole series, 8 conns/ep, 3 eps parallel
 python tvbaw.py dl 2321 -e 1-10,15             # selected episodes
 python tvbaw.py dl 2321 -c 12 -j 2             # tuning: conns per ep / eps in parallel
 python tvbaw.py dl 1407 --lang vn              # Vietnamese dub playlist
+python tvbaw.py dl 2321 --no-subs              # explicit opt-out (default: always fetch)
 python tvbaw.py dl 2321 --retry-failed --force
 
 # list series on a browse page
 python tvbaw.py browse "https://tvbanywherena.com/en/browse?year=1980s&page=5" --out p5.txt
 ```
 
-Output layout: `downloads/<series name>/<NNN> <episode title>.mp4`
+Output layout:
+
+```
+downloads/English Name - Chinese Name - Year/001 Episode 01.mp4
+                                            001 Episode 01.en.vtt
+                                            001 Episode 01.zh-HK.vtt
+```
+
+e.g. `The Intangible Truth - 生死訟 - 1990/`, `This City Never Sleeps - 璀璨之城 (EN) - 2026/`.
+English name comes from the URL slug, Chinese from Brightcove's `program_name`,
+year from the series JSON-LD `datePublished`. Episode titles are transliterated
+(`第01集` → `Episode 01`) so folders sort naturally.
 
 ## Behaviour
 

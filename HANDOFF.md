@@ -7,6 +7,9 @@
 > ⚠️ **ALWAYS the highest quality. No exceptions, no asking, no downgrading for speed.**
 > The tool selects the best source automatically (§4) — you do not need to choose.
 > Never substitute a smaller/faster file for a better one.
+>
+> ⚠️ **ALWAYS download subtitles.** They are fetched and embedded by default
+> (`--no-subs` / `--no-mux` exist only if the user explicitly asks to skip them).
 
 Everything needed already exists and is tested. Do **not** re-derive the API, do **not** scrape HTML, do **not** ask clarifying questions. Run the tool.
 
@@ -17,12 +20,13 @@ Everything needed already exists and is tested. Do **not** re-derive the API, do
 ```powershell
 cd "C:\AI STUFF\Local\tvbaw"
 $env:PYTHONIOENCODING='utf-8'
-python tvbaw.py dl "<PASTED_URL>" -c 8 -j 3 --subs --mux
+python tvbaw.py dl "<PASTED_URL>" -c 8 -j 3
 ```
 
 That is the default and correct answer to "dl this series, highest quality".
 
 - **highest quality is automatic** — the tool compares the progressive MP4 against the best HLS variant and takes whichever has more pixels; ties go to the MP4 (already muxed, much faster). Do not pass `--source` unless the user explicitly asks for a specific one.
+- **subtitles are automatic** — caption tracks are fetched and embedded as soft tracks by default. No flag needed.
 - `-c 8` — 8 parallel HTTP range connections per episode (measured sweet spot; more stops helping)
 - `-j 3` — 3 episodes at once (the CDN caps near **35 MB/s total**; raising `-j` does not go faster)
 - `--subs` — also fetch caption tracks if the title has them
@@ -75,14 +79,31 @@ Get-ChildItem "downloads\<series name>" -Filter *.mp4 -File | Where-Object { $_.
 
 ---
 
-## 3. Where files go
+## 3. Where files go — naming convention
 
 ```
-C:\AI STUFF\Local\tvbaw\downloads\<series name>\<NNN> <episode title>.mp4
-                                         \ <NNN> <episode title>.<lang>.vtt
+C:\AI STUFF\Local\tvbaw\downloads\
+    English Name - Chinese Name - Year\          <- one folder per series
+        001 Episode 01.mp4
+        001 Episode 01.en.vtt                      (sidecar, if the title has captions)
+        001 Episode 01.zh-HK.vtt
 ```
 
-`<NNN>` is zero-padded episode number, so files sort in viewing order. Subtitle files share the video's stem, which every player (VLC, mpv, Plex, Jellyfin) auto-detects. When `--mux` was used the subs are *also* inside the mp4, so the `.vtt` sidecars are optional.
+**Folder format is exactly `English Name - Chinese Name - Year`**, e.g.
+
+```
+The Intangible Truth - 生死訟 - 1990
+This City Never Sleeps - 璀璨之城 (EN) - 2026
+Hong Kong 86 - 香港‘86 - 1980
+```
+
+- `English Name` comes from the URL slug (`2906-The-Intangible-Truth` → `The Intangible Truth`)
+- `Chinese Name` is Brightcove's `program_name`
+- `Year` comes from the series JSON-LD `datePublished` (falling back to the browse-year chip). It is the site's own value — occasionally that is the decade bucket rather than the exact air year (`香港‘86` → `1980`), so report it as "the year the site lists", not as an authoritative air date.
+- `--name en|native|both` changes the title style; `both` (default) is the format above.
+- Episode files are `NNN Episode NN.mp4` — `第01集` is transliterated to `Episode 01`, so they sort correctly and are readable without Chinese input.
+- `NNN` is zero-padded, so a folder sorts in viewing order.
+- Subtitle sidecars share the video's stem — every player (VLC, mpv, Plex, Jellyfin) auto-detects them. With muxing on (default) they are *also* inside the mp4, so the `.vtt` files are optional.
 
 ---
 
@@ -119,12 +140,12 @@ If the user asks for "the captcha/720p thing" — that's the **aidrama** site, n
 
 ---
 
-## 5. Subtitles
+## 5. Subtitles — always on
 
+- Caption tracks are fetched **by default** on every download, and embedded as `mov_text` soft tracks tagged `eng` / `zho`. `--no-subs` and `--no-mux` exist only for the rare case the user asks to skip them.
 - **Newer titles have them**, usually two tracks: `en` and `zh-HK` (WebVTT).
 - **Older catalogue titles have none** — only thumbnail metadata. Check ep 1, a middle ep, and the last ep before telling the user a title has no subs.
-- `--subs` fetches them; `--mux` embeds them as `mov_text` soft tracks tagged `eng` / `zho`.
-- Backfill for an already-downloaded series: `python tvbaw.py subs <REF> --mux`
+- Backfill for an already-downloaded series: `python tvbaw.py subs <REF>` (muxing is on by default; `--no-mux` for sidecars only).
 - **Burn-in caveat:** some titles (e.g. `生死訟` / 1754 / 2906) have *hardcoded* Chinese subtitles in the picture and no tracks at all. A player cannot translate those. The fix is OCR → SRT → translate (see §7).
 
 ---
