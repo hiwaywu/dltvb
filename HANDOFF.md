@@ -121,7 +121,20 @@ The site exposes **two source types** per episode, and the tool always takes the
 1. Read the HLS ladder, take the variant with the largest `RESOLUTION` (tie → higher `BANDWIDTH`).
 2. If an MP4 exists **and** the HLS ladder reaches ≥ 1280×720, `ffprobe` the MP4 and compare pixel area.
 3. Take the larger. **On a tie, take the MP4** (already muxed, no remux, far faster).
-4. No MP4 at all → download the best HLS variant through `ffmpeg -c copy` (≈23 MB/s, single stream).
+4. No MP4 at all → the best HLS variant **plus its audio rendition**, muxed by `ffmpeg -c copy`.
+
+> ⚠️ **HLS titles: the audio lives in a separate rendition.** Brightcove puts audio in
+> `#EXT-X-MEDIA:TYPE=AUDIO` entries, *not* inside the video variant. Handing ffmpeg a
+> variant URL alone produces a **silent** file — this actually happened on
+> `893 War And Beauty`: 30 episodes downloaded video-only and had to be repaired.
+> `best_source()` now also returns `audio` (the `DEFAULT=YES` rendition of that
+> variant's AUDIO group) and `download_hls()` muxes both in one pass.
+> If you ever write an ffmpeg HLS command by hand, add the audio rendition **and**
+> `-protocol_whitelist file,http,https,tcp,tls,crypto` — without it ffmpeg rejects
+> remote URIs referenced from a local playlist (`Protocol 'https' not on whitelist`).
+>
+> `War And Beauty` offers `cmn (Dub)`, `vi (Dub)` and `yue (Main)`; the tool takes
+> `DEFAULT=YES`, i.e. **yue — the original Cantonese**.
 
 Verified behaviour:
 
@@ -165,7 +178,7 @@ python hardsub.py all "downloads\<series>\<episode>.mp4"        # full episode
 python hardsub.py all "…\001 Episode 01.mp4" --start 0 --end 700  # a slice, for a quality check
 ```
 
-Produces `<video>.zh.srt` (OCR'd Chinese) and `<video>.en.srt` (English).
+Produces `<video>.raw-ocr.zh.srt` (straight OCR), `<video>.zh.srt` (after the cleanup rules) and `<video>.en.srt` (English).
 
 Stage by stage, if you need them separately:
 
@@ -178,11 +191,13 @@ python hardsub.py translate  x.zh.srt -o x.en.srt
 ### How it works (and why in this order)
 
 1. **ffmpeg crops the subtitle band** — bottom 30% (`crop=iw:ih*0.30:0:ih*0.68`) and emits frames at 1 fps. Nothing else is decoded.
-2. **Row-ink profile finds the text lines** in each frame (`line_bands`) — no CNN detector. This is the single most important optimisation: running the PP-OCR *detector* on every frame costs **~1000 ms/frame** (≈90 min per episode). Splitting lines by brightness and calling the *recogniser* only costs **~30 ms/frame** (≈60–90 s per episode). **Never put the detector back in the loop.**
+2. **Glyph mask + row profile finds the text lines** in each frame (`glyph_mask`, `line_bands`) — no CNN detector. The mask keeps only bright pixels next to a black outline, in stroke-sized blobs, so white cups/shirts/lamps no longer create phantom lines; the **bottom** two lines are read, each cropped tightly to its text. (The old plain-brightness version took the *top* two bands and routinely dropped the real second subtitle line.) The two lines are kept as separate words (space-joined), not glued into one run-on sentence. This is the single most important optimisation: running the PP-OCR *detector* on every frame costs **~1000 ms/frame** (≈90 min per episode). Splitting lines by brightness and calling the *recogniser* only costs **~30 ms/frame** (≈60–90 s per episode). **Never put the detector back in the loop.**
 3. **Junk filter** (`is_junk`) drops signage/credits: pure-latin or numeric fragments, and 1–2 glyph cues that flash by in under 1.5 s. Measured: removed 9 of 91 cues (10%) with no loss of dialogue.
 4. **Temporal voting** (`group`) — the same subtitle persists across 4–8 frames; the most frequent reading in the cue wins, which removes random single-frame slips.
-5. **Cleanup pass** (`cleanup_srt`) — a confusion table of systematic misreads, then OpenCC `s2t` to force consistent Traditional Chinese. Measured: **58 of 82 lines repaired**.
-6. **Translate** — public Google endpoint (`translate.googleapis.com/translate_a/single?client=gtx`), no API key, ~0.1 s/cue.
+5. **Cleanup pass** (`cleanup_srt`) — `CONFUSIONS`, then OpenCC `s2t`, then `TRAD_CONFUSIONS` (rules written in Traditional only: 追→這, 度→麼, 遺→還, 逼→過, 實→買, 翰/韓→幹 …, with exclusions for real words like 追求/遺產/證實).
+6. **Translate** — public Google endpoint (`translate.googleapis.com/translate_a/single?client=gtx`), no API key. Source pinned to `zh-TW` (`auto` misdetected short cues), cues sent **newline-joined in batches by POST** (~1500 chars each); falls back to per-cue if the line count comes back different. ~1–3 s per episode instead of ~90 s.
+
+Measured on 生死訟 ep 2, 0–10 min, 16 random cues checked against the frames: Chinese exactly right **8/16 (was ~3/16, plus 3 cues missing)**; English carries the right meaning ~12/16. OCR 21 ms/frame (was 39). The red-calligraphy theme-song lyrics are no longer picked up (they were nonsense before anyway).
 
 ### The confusion table is the secret sauce
 
@@ -204,12 +219,73 @@ PP-OCR misses the **same** characters every time on a given font. These are not 
 
 **When you start a new series, extend `CONFUSIONS` in `hardsub.py` first.** Run `ocr` on a 5-minute slice, read the output, add the patterns you see — 20 minutes of that raises accuracy more than any model swap. Keep the table per-font; it does not generalise across different masters.
 
+### Best quality: the proof-read pass (what the user wants for finished episodes)
+
+OCR + rules is only a draft. Measured on 生死訟 ep 2 against the real frames: **39% of lines exactly right** (190/487); most of the rest were missing a glyph or had a look-alike, and some flipped the meaning (`插他們` "beat them up" was really `捅他們` "stab them"). Google Translate on top of that is worse still. For an episode the user will actually watch, do this. The user asked for it explicitly: they want *you* (Claude, on their subscription) to read the frames and translate, not an API.
+
+**Per episode, in order:**
+
+```powershell
+cd "C:\AI STUFF\Local\tvbaw"
+$env:PYTHONIOENCODING='utf-8'
+$ep = "downloads\The Intangible Truth - 生死訟 - 1990\003 Episode 03"
+python hardsub.py all "$ep.mp4"                                   # 1. OCR draft (~2 min)
+python hardsub.py sheets "$ep.mp4" "$ep.raw-ocr.zh.srt" -o <scratch>\ep03   # 2. ~50 contact sheets
+```
+
+3. **Read every sheet** (`sheet01.png` … ~50 images, 10 cues each, cue number in the yellow margin). For every cue write one line, `N|corrected 中文|English`, into a review file in your scratchpad:
+   - Chinese exactly as on screen; a space between the two subtitle lines.
+   - English translated **from the corrected Chinese, with scene context**, not per line in isolation. Two speakers in one cue → separate with ` / `.
+   - **Empty Chinese (`N||`) drops the cue.** Use it for repeat frames of the same subtitle and for junk; the previous cue then runs on over its time.
+   - If a frame shows no subtitle (the cue midpoint fell between lines), keep the OCR text if it is plausible and fix it from context.
+   - There must be a line for every cue number, or `apply` refuses.
+4. **Build the files:**
+   ```powershell
+   python hardsub.py apply "$ep.raw-ocr.zh.srt" <review.txt> --zh "$ep.zh.srt" --en "$ep.en.srt"
+   ```
+   If a Google draft `.en.srt` is there, rename it to `.google.en.srt` first so it is kept for comparison.
+5. **Second check (mandatory; the user asked for it).** Print the finished pairs side by side and read all of them:
+   ```powershell
+   python -c "import sys;sys.path.insert(0,'.');import hardsub as H;z=H.read_srt(r'$ep.zh.srt');e=H.read_srt(r'$ep.en.srt');print(len(z),len(e));[print(i,H.ts(a['start'])[3:8],a['text'],'|',b['text']) for i,(a,b) in enumerate(zip(z,e),1)]"
+   ```
+   Confirm: same cue count, same timings, no empty line, no Chinese left in the English, and every English line says what its Chinese says. Fix what you find, then report to the user: cue count, OCR accuracy (how many lines were already exactly right), notable meaning fixes, and anything you are unsure of.
+
+**Cost:** ~50 image reads plus ~500 lines of writing per episode. That is a real share of the user's subscription limits, so do one episode at a time and check before doing a batch of them.
+
+**Known gap:** the pass only checks moments where OCR found a subtitle. A line the OCR missed entirely stays missing.
+
+**Episode files when done:**
+
+```
+002 Episode 02.zh.srt            proof-read Chinese (auto-loads)
+002 Episode 02.en.srt            proof-read English (auto-loads)
+002 Episode 02.raw-ocr.zh.srt    straight OCR, for comparison
+002 Episode 02.google.en.srt     machine translation of the OCR, for comparison
+```
+
+**Series glossary: 生死訟, keep consistent across episodes**
+
+| Chinese | English | who |
+|---|---|---|
+| 馬海 | Ma Hai | son; car mechanic, about to go to sea (跑船) |
+| 馬潔 | Ma Jie | elder sister; runs the vegetable stall |
+| 馬泳 | Ma Yong | youngest sister, schoolgirl |
+| 馬洋 | Ma Yang | son of the father's other (wealthy) family; calls his mother 媽咪 "Mummy" |
+| 葉蔚 / 火柴頭 | Ye Wei / "Matchstick" | Ma Hai's tomboy friend |
+| 葉榮生 | Ye Rongsheng | Ye Wei's father, dying in hospital |
+| 狐狸精 | vixen | what each wife calls the other |
+| 冬節 / 過冬節 | the Winter Solstice | family festival; "冬比年大" = the Solstice matters more than New Year |
+| 大陸 | the mainland | |
+| 高利貸 / 放高利貸的 | loan sharks | |
+
+Ep 1 still has only the old OCR + Google pilot (first 11m40s, in `_subtitle_pilot`). Ep 2 is the only one done with the proof-read pass.
+
 ### Quality you can promise
 
 - raw OCR: ~75% of lines correct
 - after junk filter + cleanup: **~80–85%**
 - remaining failures are unknown words (`是呀起上還肯給你開庭重` — `起上` is not a word) and lost capitalisation
-- **never claim a finished translation.** Call it a rough draft and let the user read it.
+- **never claim a finished translation** from OCR + Google alone. Call it a rough draft. Only an episode that has been through the proof-read pass above counts as finished.
 
 ### Verify before batching
 
@@ -246,7 +322,7 @@ Keep raw and cleaned versions distinguishable (`…raw-ocr.zh.srt` vs `.zh.srt`)
 |---|---|
 | OCR (30 ms/frame @ 1 fps) | 60–90 s |
 | cleanup | instant |
-| translate (~360 cues) | ~40 s |
+| translate (~360 cues, batched) | ~3 s |
 | **total** | **~2–3 min** |
 
 All 25 episodes ≈ **1–1.5 hours**.
@@ -269,7 +345,9 @@ All 25 episodes ≈ **1–1.5 hours**.
 | `playback 403 ... ACCESS_DENIED / DOMAIN` | Missing `Origin` header | The tool always sends `Origin: https://tvbanywherena.com`; if hand-calling the API, you must add it |
 | `VIDEO_NOT_PLAYABLE` | Title is geo/policy locked on Brightcove | Report it and move on; ~4 such series exist in the 2000s category alone |
 | Download stalls or 403s mid-transfer | `fastly_token` in the media URL expired | The tool re-resolves and retries automatically; a manual retry is `python tvbaw.py dl <REF>` again |
-| `no MP4 source` | Title is HLS-only | Handled automatically — the tool falls back to `ffmpeg` on the best HLS variant. If you see this error, the fallback itself failed: check `ffmpeg` is on PATH |
+| `no MP4 source` | Title is HLS-only | Handled automatically — the tool falls back to `ffmpeg` on the best HLS variant + its audio rendition. If you see this error, the fallback itself failed: check `ffmpeg` is on PATH |
+| File plays but is **silent** | HLS variant downloaded without its audio rendition | Already fixed in `download_hls()`; to repair existing files fetch only the audio and mux: `ffmpeg -protocol_whitelist file,http,https,tcp,tls,crypto -i video.mp4 -i <audio.m3u8> -map 0:v:0 -map 1:a:0 -c copy -bsf:a aac_adtstoasc out.mp4`. ~40 MB per episode instead of re-downloading |
+| `Protocol 'https' not on whitelist` | ffmpeg given a **local** m3u8 that references remote URIs | add `-protocol_whitelist file,http,https,tcp,tls,crypto` |
 | `ffmpeg is required for HLS-only titles` | ffmpeg missing | Install ffmpeg; HLS-only titles cannot be fetched without it |
 | Batch interrupted | — | Just rerun the same command: finished files are skipped, `.part` files resume |
 
@@ -291,7 +369,7 @@ All 25 episodes ≈ **1–1.5 hours**.
 2. **Don't ask which episodes or which quality** — default is all episodes at highest. The user will say if they want a subset.
 3. **Don't re-implement the API** — the tool works. If it fails, fix the tool, don't hand-roll curl.
 4. **Don't dump download progress** into the chat. Poll the folder.
-5. **Always verify with ffprobe** before saying "done".
+5. **Always verify with ffprobe — video AND audio streams, plus duration.** Checking resolution and runtime alone is how a batch of 30 silent files once got reported as done. An episode must show exactly one `codec_type=video` and one `codec_type=audio`.
 6. **Quote real numbers** you measured (resolution, size, duration, speed) — never assume.
 7. If disk space is short, report it *before* starting rather than filling the drive.
 8. Say where the files are, with the absolute path.

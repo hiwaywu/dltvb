@@ -26,6 +26,7 @@ import re
 import shutil
 import subprocess
 import sys
+import tempfile
 import threading
 import time
 from concurrent.futures import ThreadPoolExecutor
@@ -288,35 +289,78 @@ def pick_sources(data: dict) -> dict:
     return out
 
 
-_hls_cache: dict[str, list[dict]] = {}
+_hls_cache: dict[str, dict] = {}
 _mp4_dim: dict[str, tuple[int, int]] = {}
 
 
-def hls_variants(master_url: str) -> list[dict]:
-    """Parse the master playlist into [{w,h,bw,url}] (cached per master URL)."""
+def hls_master(master_url: str) -> dict:
+    """Parse an HLS master into {'variants': [...], 'audio': {group: [rendition]}}.
+
+    Brightcove keeps audio in separate #EXT-X-MEDIA renditions, so a variant URL
+    alone is VIDEO ONLY. Anything downloading a variant must also fetch the audio
+    rendition belonging to that variant's AUDIO group, or the result is silent.
+    """
     if master_url in _hls_cache:
         return _hls_cache[master_url]
-    out: list[dict] = []
+
+    variants: list[dict] = []
+    audio: dict[str, list[dict]] = {}
     try:
         txt = get(master_url).text
         cur = None
         for line in (l.strip() for l in txt.splitlines()):
             if not line:
                 continue
-            if line.startswith("#EXT-X-STREAM-INF"):
+            if line.startswith("#EXT-X-MEDIA"):
+                if 'TYPE=AUDIO' not in line:
+                    continue
+                grp = re.search(r'GROUP-ID="([^"]+)"', line)
+                uri = re.search(r'URI="([^"]+)"', line)
+                nm = re.search(r'NAME="([^"]+)"', line)
+                lg = re.search(r'LANGUAGE="([^"]+)"', line)
+                dflt = "DEFAULT=YES" in line
+                if grp and uri:
+                    audio.setdefault(grp.group(1), []).append({
+                        "name": nm.group(1) if nm else "",
+                        "lang": lg.group(1) if lg else "",
+                        "default": dflt,
+                        "url": urljoin(master_url, uri.group(1)),
+                    })
+            elif line.startswith("#EXT-X-STREAM-INF"):
                 m = re.search(r"RESOLUTION=(\d+)x(\d+)", line)
                 bw = re.search(r"BANDWIDTH=(\d+)", line)
+                grp = re.search(r'AUDIO="([^"]+)"', line)
                 cur = {"w": int(m.group(1)) if m else 0,
                        "h": int(m.group(2)) if m else 0,
-                       "bw": int(bw.group(1)) if bw else 0}
+                       "bw": int(bw.group(1)) if bw else 0,
+                       "group": grp.group(1) if grp else None}
             elif cur is not None and not line.startswith("#"):
                 cur["url"] = urljoin(master_url, line)
-                out.append(cur)
+                variants.append(cur)
                 cur = None
     except Exception:
         pass
-    _hls_cache[master_url] = out
-    return out
+
+    _hls_cache[master_url] = {"variants": variants, "audio": audio}
+    return _hls_cache[master_url]
+
+
+def hls_variants(master_url: str) -> list[dict]:
+    return hls_master(master_url)["variants"]
+
+
+def hls_default_audio(master_url: str, group: str | None) -> dict | None:
+    """The DEFAULT audio rendition for a variant's AUDIO group."""
+    groups = hls_master(master_url)["audio"]
+    if not groups:
+        return None
+    cands = groups.get(group) if group else None
+    if not cands:
+        cands = next(iter(groups.values()))
+    for a in cands:
+        if a["default"]:
+            return a
+    return cands[0] if cands else None
 
 
 def mp4_dims(url: str) -> tuple[int, int]:
@@ -357,10 +401,14 @@ def best_source(data: dict, want: str = "auto") -> dict | None:
         vs = hls_variants(srcs["hls"])
         if vs:
             top = max(vs, key=lambda v: (v["w"] * v["h"], v["bw"]))
+            aud = hls_default_audio(srcs["hls"], top.get("group"))
             hls = {"kind": "hls", "url": top["url"], "w": top["w"], "h": top["h"],
-                   "bw": top["bw"]}
+                   "bw": top["bw"], "audio": aud["url"] if aud else None,
+                   "audio_lang": aud["lang"] if aud else None,
+                   "audio_name": aud["name"] if aud else None}
         else:
-            hls = {"kind": "hls", "url": srcs["hls"], "w": 0, "h": 0, "bw": 0}
+            hls = {"kind": "hls", "url": srcs["hls"], "w": 0, "h": 0, "bw": 0,
+                   "audio": None, "audio_lang": None, "audio_name": None}
 
     def probe(rec: dict) -> dict:
         if rec and not rec.get("probed") and rec["kind"] == "mp4":
@@ -383,18 +431,48 @@ def best_source(data: dict, want: str = "auto") -> dict | None:
     return probe(mp4) if mp4 else hls
 
 
-def download_hls(url: str, dest: str) -> tuple[int, float]:
-    """Fetch an HLS variant through ffmpeg (single stream, stream-copy remux)."""
+def download_hls(url: str, dest: str, audio: str | None = None) -> tuple[int, float]:
+    """Fetch an HLS variant through ffmpeg (stream-copy remux).
+
+    If `audio` is given, the video variant and that audio rendition are muxed in
+    one pass — Brightcove splits them, so the variant alone is silent.
+    """
     if not shutil.which("ffmpeg"):
         raise RuntimeError("ffmpeg is required for HLS-only titles")
+
     tmp = dest + ".part.mp4"
     t0 = time.time()
-    cmd = ["ffmpeg", "-v", "error", "-y", "-i", url,
-           "-c", "copy", "-bsf:a", "aac_adtstoasc", "-f", "mp4", tmp]
-    p = subprocess.run(cmd, capture_output=True, text=True)
-    if p.returncode != 0 or not os.path.exists(tmp):
-        raise RuntimeError("ffmpeg: " + (p.stderr.strip().splitlines() or ["failed"])[-1][:180])
-    os.replace(tmp, dest)
+    try:
+        if audio:
+            # a trimmed local master: one video variant + its audio rendition
+            local = tempfile.mkstemp(suffix=".m3u8")[1]
+            with open(local, "w", encoding="utf-8") as fh:
+                fh.write("#EXTM3U\n")
+                fh.write('#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="aud",NAME="main",'
+                         f'DEFAULT=YES,URI="{audio}"\n')
+                fh.write('#EXT-X-STREAM-INF:BANDWIDTH=1,AUDIO="aud"\n')
+                fh.write(url + "\n")
+            source = local
+        else:
+            local, source = None, url
+
+        cmd = ["ffmpeg", "-v", "error", "-y",
+               "-protocol_whitelist", "file,http,https,tcp,tls,crypto",
+               "-i", source,
+               "-map", "0:v:0", "-map", "0:a:0?",
+               "-c", "copy", "-bsf:a", "aac_adtstoasc", "-f", "mp4", tmp]
+        p = subprocess.run(cmd, capture_output=True, text=True)
+        if p.returncode != 0 or not os.path.exists(tmp):
+            raise RuntimeError("ffmpeg: " + (p.stderr.strip().splitlines() or ["failed"])[-1][:180])
+        os.replace(tmp, dest)
+    finally:
+        if audio and local:
+            for _ in range(5):
+                try:
+                    os.remove(local)
+                    break
+                except OSError:
+                    time.sleep(0.3)
     return os.path.getsize(dest), time.time() - t0
 
 
@@ -762,11 +840,12 @@ def cmd_dl(args) -> None:
             if bs["kind"] == "mp4":
                 size, sec = download(fresh, dest, conns=args.conns)
             else:
-                size, sec = download_hls(bs["url"], dest)
+                size, sec = download_hls(bs["url"], dest, audio=bs.get("audio"))
             rate = size / sec if sec else 0
             res = f" {bs['w']}x{bs['h']}" if bs.get("w") else ""
+            au = f" +audio:{bs['audio_name']}" if bs.get("audio") else ""
             print(f"[{i}/{len(eps)}] done {label}  {_fmt(size)} in {sec:.0f}s "
-                  f"({_fmt(rate)}/s, {bs['kind']}{res})")
+                  f"({_fmt(rate)}/s, {bs['kind']}{res}{au})")
             do_subs()
             with lock:
                 got += 1
