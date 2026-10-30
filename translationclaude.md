@@ -55,6 +55,13 @@ N|中文 exactly as on screen|English
 
 Rules that produced the episode 2 result:
 
+- **Story only. Never subtitle the theme song or the end credits.** Opening title
+  lyrics, the closing credit roll, and any "next episode" tag are not dialogue —
+  however legible they are, leave the Chinese part empty (`N||`) so the cue is
+  dropped and the run of dialogue stays unbroken. The one exception is on-screen
+  text the story actually depends on: a sign, a letter, a newspaper headline, a
+  court document. Verified on 天若有情 ep 1: cues 1–4 were the opening lyrics and
+  are now dropped; the last cue of the episode is real dialogue, not credits.
 - **Chinese:** copy what the frame shows, character for character, in Traditional script. Put a **space** between the two subtitle lines, which becomes a line break in the SRT. Keep the subtitler's punctuation (`…`, `？`, `，`).
 - **Drop duplicates and junk with an empty Chinese part: `N||`.** The OCR often splits one subtitle into 2–4 cues (one frame read half a line, the next the whole line). Keep the cue with the full text, and empty the others. An empty cue is removed and the cue before it stretches over its time.
 - **No subtitle visible** (the midpoint fell between two lines): keep the OCR text if it's plausible, corrected from context.
@@ -304,5 +311,5 @@ Per 46-minute episode: OCR about 2 min, sheets about 1 min, then reading about 5
 ## Known limits
 
 - The pass only checks cues the OCR found. A subtitle the OCR missed entirely stays missing.
-- The red-calligraphy theme-song lyrics in the opening are not picked up (the glyph mask rejects them on purpose).
+- Theme-song lyrics and end credits are dropped **by rule**, not by accident (see step 3). Red-calligraphy titles are additionally rejected by the glyph mask, but do not rely on the mask: blank them explicitly.
 - Romanised names are pinyin, chosen in episode 2. If the user prefers Cantonese romanisation (Ma Hoi, …), change the glossary and say so.

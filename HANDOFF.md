@@ -192,6 +192,11 @@ If the user asks for "the captcha/720p thing" — that's the **aidrama** site, n
 
 ### Non-negotiables from that doc
 
+- **Story only — never the theme song or the end credits.** Opening lyrics and the
+  closing credit roll are not dialogue: leave the Chinese part empty (`N||`) so the
+  cue is dropped. On-screen text the story depends on (a sign, a letter, a headline,
+  a court document) stays in. Verified on 天若有情 ep 1 — the first cue of the
+  delivered SRT is dialogue at 03:12, not the opening lyrics.
 - **Do not ship Google Translate, and do not leave OCR files in the episode folder.** Per episode the folder ends with exactly two subtitle files: `<ep>.zh.srt` and `<ep>.en.srt`.
 - **Measured accuracy is why:** OCR + cleanup rules got only **32–44%** of lines exactly right on every episode; Google then translates the mistakes literally (`多少鰱` → "how much silver carp"). Reading the frames is what makes the result good.
 - **British spelling**, natural spoken English, short enough to read in the cue time. Keep insults strong, keep idioms idiomatic, never explain culture in the subtitle.
