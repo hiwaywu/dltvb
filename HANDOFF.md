@@ -10,6 +10,12 @@
 >
 > ⚠️ **ALWAYS download subtitles.** They are fetched and embedded by default
 > (`--no-subs` / `--no-mux` exist only if the user explicitly asks to skip them).
+>
+> ⚠️ **NEVER download a dub. Cantonese first, Mandarin second, otherwise refuse.**
+> Titles often offer `vn` (Vietnamese), `es` (Spanish) or `en` dubs — the user does
+> **not** want those. `choose_language()` now enforces this: `tc`/`yue` (Cantonese),
+> then `cmn`/`zh` (Mandarin). If a title has neither, the tool stops and says so —
+> **tell the user it has no Cantonese or Mandarin track and download nothing.**
 
 Everything needed already exists and is tested. Do **not** re-derive the API, do **not** scrape HTML, do **not** ask clarifying questions. Run the tool.
 
@@ -121,7 +127,20 @@ The site exposes **two source types** per episode, and the tool always takes the
 1. Read the HLS ladder, take the variant with the largest `RESOLUTION` (tie → higher `BANDWIDTH`).
 2. If an MP4 exists **and** the HLS ladder reaches ≥ 1280×720, `ffprobe` the MP4 and compare pixel area.
 3. Take the larger. **On a tie, take the MP4** (already muxed, no remux, far faster).
-4. No MP4 at all → download the best HLS variant through `ffmpeg -c copy` (≈23 MB/s, single stream).
+4. No MP4 at all → the best HLS variant **plus its audio rendition**, muxed by `ffmpeg -c copy`.
+
+> ⚠️ **HLS titles: the audio lives in a separate rendition.** Brightcove puts audio in
+> `#EXT-X-MEDIA:TYPE=AUDIO` entries, *not* inside the video variant. Handing ffmpeg a
+> variant URL alone produces a **silent** file — this actually happened on
+> `893 War And Beauty`: 30 episodes downloaded video-only and had to be repaired.
+> `best_source()` now also returns `audio` (the `DEFAULT=YES` rendition of that
+> variant's AUDIO group) and `download_hls()` muxes both in one pass.
+> If you ever write an ffmpeg HLS command by hand, add the audio rendition **and**
+> `-protocol_whitelist file,http,https,tcp,tls,crypto` — without it ffmpeg rejects
+> remote URIs referenced from a local playlist (`Protocol 'https' not on whitelist`).
+>
+> `War And Beauty` offers `cmn (Dub)`, `vi (Dub)` and `yue (Main)`; the tool takes
+> `DEFAULT=YES`, i.e. **yue — the original Cantonese**.
 
 Verified behaviour:
 
@@ -150,139 +169,58 @@ If the user asks for "the captcha/720p thing" — that's the **aidrama** site, n
 
 ---
 
-## 5b. Burned-in subtitles — "can you translate this?" → OCR → clean → translate
+## 5b. Burned-in subtitles — read `translationclaude.md` FIRST
 
-**Trigger:** the user asks for subtitles/translation on a title whose `text_tracks` contain only `kind: metadata` thumbnails. There is no caption file anywhere — not in Brightcove, not in the HLS manifest, not in the player. `hardsub.py` exists for exactly this.
+**Trigger:** the user asks for subtitles/translation on a title whose `text_tracks` contain only `kind: metadata` thumbnails. There is no caption file anywhere — not in Brightcove, not in the HLS manifest, not in the player.
 
-**No player can do this live.** VLC/mpv/PotPlayer only translate *soft* subtitle tracks. Hardsub text must be converted to a file first; after that every player works.
+> **The authoritative method is [`translationclaude.md`](translationclaude.md). Read it in full before touching an episode.**
+> It is the result of a full 25-episode run and it is *not* OCR + Google Translate.
+> A series glossary lives beside it (`translationclaude.md` carries the 生死訟 one
+> inline; `glossary-war-and-beauty.md` is the next series).
 
-### The one command
+**No player can do this live.** VLC/mpv/PotPlayer only translate *soft* tracks, so the text must become a file first.
 
-```powershell
-cd "C:\AI STUFF\Local\tvbaw"
-$env:PYTHONIOENCODING='utf-8'
-python hardsub.py all "downloads\<series>\<episode>.mp4"        # full episode
-python hardsub.py all "…\001 Episode 01.mp4" --start 0 --end 700  # a slice, for a quality check
-```
+### What the method actually is
 
-Produces `<video>.raw-ocr.zh.srt` (straight OCR), `<video>.zh.srt` (after the cleanup rules) and `<video>.en.srt` (English).
-
-Stage by stage, if you need them separately:
-
-```powershell
-python hardsub.py ocr        "<video>" -o x.zh.srt [--fps 1] [--start S --end S]
-python hardsub.py cleanup    x.zh.srt -o x.clean.zh.srt --translate
-python hardsub.py translate  x.zh.srt -o x.en.srt
-```
-
-### How it works (and why in this order)
-
-1. **ffmpeg crops the subtitle band** — bottom 30% (`crop=iw:ih*0.30:0:ih*0.68`) and emits frames at 1 fps. Nothing else is decoded.
-2. **Glyph mask + row profile finds the text lines** in each frame (`glyph_mask`, `line_bands`) — no CNN detector. The mask keeps only bright pixels next to a black outline, in stroke-sized blobs, so white cups/shirts/lamps no longer create phantom lines; the **bottom** two lines are read, each cropped tightly to its text. (The old plain-brightness version took the *top* two bands and routinely dropped the real second subtitle line.) The two lines are kept as separate words (space-joined), not glued into one run-on sentence. This is the single most important optimisation: running the PP-OCR *detector* on every frame costs **~1000 ms/frame** (≈90 min per episode). Splitting lines by brightness and calling the *recogniser* only costs **~30 ms/frame** (≈60–90 s per episode). **Never put the detector back in the loop.**
-3. **Junk filter** (`is_junk`) drops signage/credits: pure-latin or numeric fragments, and 1–2 glyph cues that flash by in under 1.5 s. Measured: removed 9 of 91 cues (10%) with no loss of dialogue.
-4. **Temporal voting** (`group`) — the same subtitle persists across 4–8 frames; the most frequent reading in the cue wins, which removes random single-frame slips.
-5. **Cleanup pass** (`cleanup_srt`) — `CONFUSIONS`, then OpenCC `s2t`, then `TRAD_CONFUSIONS` (rules written in Traditional only: 追→這, 度→麼, 遺→還, 逼→過, 實→買, 翰/韓→幹 …, with exclusions for real words like 追求/遺產/證實).
-6. **Translate** — public Google endpoint (`translate.googleapis.com/translate_a/single?client=gtx`), no API key. Source pinned to `zh-TW` (`auto` misdetected short cues), cues sent **newline-joined in batches by POST** (~1500 chars each); falls back to per-cue if the line count comes back different. ~1–3 s per episode instead of ~90 s.
-
-Measured on 生死訟 ep 2, 0–10 min, 16 random cues checked against the frames: Chinese exactly right **8/16 (was ~3/16, plus 3 cues missing)**; English carries the right meaning ~12/16. OCR 21 ms/frame (was 39). The red-calligraphy theme-song lyrics are no longer picked up (they were nonsense before anyway).
-
-### The confusion table is the secret sauce
-
-PP-OCR misses the **same** characters every time on a given font. These are not random errors, so they are fixable with rules — learned from real `生死訟` (1990) output, and they recur across episodes of the same series:
-
-| OCR reads | actually | example |
+| Stage | Tool | Notes |
 |---|---|---|
-| `磨` / `擎` | `麼` | `怎磨` → `怎麼`, `基磨` → `甚麼` |
-| `遗` | `還` | `遗肯` → `還肯` |
-| `雨` | `兩` | `雨个` → `兩個` |
-| `道` (in bigrams) | `這` | `道个` → `這個`, `道種` → `這種` |
-| `雞道` | `難道` | |
-| `骞` | `審` | `重骞` → `重審` |
-| `赖` | `報` | `好赖` → `好報` |
-| `毅人` | `殺人` | `放火毅人` → `放火殺人` |
-| `检查` | `檢察官` | `请检查判` → `請檢察官法官` |
-| `洋赢` | `贏` | `你洋赢` → `你贏` |
-| `阴庭` | `休庭` | `在阴庭後` → `在休庭後` |
+| 1. OCR for **timings only** | `python hardsub.py ocr <ep>.mp4 -o <scratchpad>\raw.zh.srt` | write to a scratchpad, never the episode folder — the OCR text is a first guess, not the deliverable |
+| 2. Contact sheets | `python hardsub.py sheets <ep>.mp4 <raw.zh.srt> -o <scratchpad>` | one crop per cue at its midpoint, 10 stacked per sheet, cue number in a yellow margin (~50 sheets/episode) |
+| 3. **Claude reads every sheet** | — | write `N|中文字|English` for every cue; this is the real work and takes most of the time |
+| 4. Build the SRTs | `python hardsub.py apply <raw.zh.srt> <review.txt> --zh <ep>.zh.srt --en <ep>.en.srt` | refuses if any cue number is missing; empty 中文 drops a cue and stretches the previous one |
+| 5. **Second check (mandatory)** | — | print both files side by side and read every pair; fix, re-check, then report |
 
-**When you start a new series, extend `CONFUSIONS` in `hardsub.py` first.** Run `ocr` on a 5-minute slice, read the output, add the patterns you see — 20 minutes of that raises accuracy more than any model swap. Keep the table per-font; it does not generalise across different masters.
+### Non-negotiables from that doc
 
-### Best quality: the proof-read pass (what the user wants for finished episodes)
+- **Story only — never the theme song or the end credits.** Opening lyrics and the
+  closing credit roll are not dialogue: leave the Chinese part empty (`N||`) so the
+  cue is dropped. On-screen text the story depends on (a sign, a letter, a headline,
+  a court document) stays in. Verified on 天若有情 ep 1 — the first cue of the
+  delivered SRT is dialogue at 03:12, not the opening lyrics.
+- **Do not ship Google Translate, and do not leave OCR files in the episode folder.** Per episode the folder ends with exactly two subtitle files: `<ep>.zh.srt` and `<ep>.en.srt`.
+- **Measured accuracy is why:** OCR + cleanup rules got only **32–44%** of lines exactly right on every episode; Google then translates the mistakes literally (`多少鰱` → "how much silver carp"). Reading the frames is what makes the result good.
+- **British spelling**, natural spoken English, short enough to read in the cue time. Keep insults strong, keep idioms idiomatic, never explain culture in the subtitle.
+- **Translate as a scene, not line by line** — who is speaking to whom decides "you" vs "she".
+- **Names come from the glossary.** Add new characters as you meet them and report them so the glossary can be merged.
+- **Unsure about a line?** Give your best reading and list those cue numbers in the report. Never guess silently.
+- **One episode at a time, finished (second check included) before starting the next.** A 46-minute episode is ~5–13 min of agent work; it is real subscription usage, so expect to hit limits after a few and continue in the next window. If running several, stagger the OCR starts ~3 min apart so only one is OCR-heavy at a time.
 
-OCR + rules is only a draft. Measured on 生死訟 ep 2 against the real frames: **39% of lines exactly right** (190/487); most of the rest were missing a glyph or had a look-alike, and some flipped the meaning (`插他們` "beat them up" was really `捅他們` "stab them"). Google Translate on top of that is worse still. For an episode the user will actually watch, do this. The user asked for it explicitly: they want *you* (Claude, on their subscription) to read the frames and translate, not an API.
+### Why the OCR step is built the way it is
 
-**Per episode, in order:**
+- The subtitle band is cropped (`crop=iw:ih*0.30:0:ih*0.68`) and sampled at 1 fps; only that strip is decoded.
+- Lines are found with a **row-ink profile** (`glyph_mask` / `line_bands`), not the PP-OCR detector. The detector costs **~1000 ms/frame** (≈90 min per episode); the recogniser alone is **~30 ms/frame** (60–90 s). **Never put the detector back in the loop.**
+- `is_junk()` drops signage, `group()` does temporal voting — this is about clean timings and a decent first guess, nothing more.
 
-```powershell
-cd "C:\AI STUFF\Local\tvbaw"
-$env:PYTHONIOENCODING='utf-8'
-$ep = "downloads\The Intangible Truth - 生死訟 - 1990\003 Episode 03"
-python hardsub.py all "$ep.mp4"                                   # 1. OCR draft (~2 min)
-python hardsub.py sheets "$ep.mp4" "$ep.raw-ocr.zh.srt" -o <scratch>\ep03   # 2. ~50 contact sheets
-```
+### Fallback only — when nobody can read sheets
 
-3. **Read every sheet** (`sheet01.png` … ~50 images, 10 cues each, cue number in the yellow margin). For every cue write one line, `N|corrected 中文|English`, into a review file in your scratchpad:
-   - Chinese exactly as on screen; a space between the two subtitle lines.
-   - English translated **from the corrected Chinese, with scene context**, not per line in isolation. Two speakers in one cue → separate with ` / `.
-   - **Empty Chinese (`N||`) drops the cue.** Use it for repeat frames of the same subtitle and for junk; the previous cue then runs on over its time.
-   - If a frame shows no subtitle (the cue midpoint fell between lines), keep the OCR text if it is plausible and fix it from context.
-   - There must be a line for every cue number, or `apply` refuses.
-4. **Build the files:**
-   ```powershell
-   python hardsub.py apply "$ep.raw-ocr.zh.srt" <review.txt> --zh "$ep.zh.srt" --en "$ep.en.srt"
-   ```
-   If a Google draft `.en.srt` is there, rename it to `.google.en.srt` first so it is kept for comparison.
-5. **Second check (mandatory; the user asked for it).** Print the finished pairs side by side and read all of them:
-   ```powershell
-   python -c "import sys;sys.path.insert(0,'.');import hardsub as H;z=H.read_srt(r'$ep.zh.srt');e=H.read_srt(r'$ep.en.srt');print(len(z),len(e));[print(i,H.ts(a['start'])[3:8],a['text'],'|',b['text']) for i,(a,b) in enumerate(zip(z,e),1)]"
-   ```
-   Confirm: same cue count, same timings, no empty line, no Chinese left in the English, and every English line says what its Chinese says. Fix what you find, then report to the user: cue count, OCR accuracy (how many lines were already exactly right), notable meaning fixes, and anything you are unsure of.
+`python hardsub.py all <ep>.mp4` chains OCR → `CONFUSIONS` repair → Google Translate. It exists for bulk triage when frame-reading is impossible. It is **not** the deliverable the user wants; it lands at ~80–85% and reads like machine translation. Use it only if the user explicitly asks for something quick and rough.
 
-**Cost:** ~50 image reads plus ~500 lines of writing per episode. That is a real share of the user's subscription limits, so do one episode at a time and check before doing a batch of them.
+### How to do better next time
 
-**Known gap:** the pass only checks moments where OCR found a subtitle. A line the OCR missed entirely stays missing.
-
-**Episode files when done:**
-
-```
-002 Episode 02.zh.srt            proof-read Chinese (auto-loads)
-002 Episode 02.en.srt            proof-read English (auto-loads)
-002 Episode 02.raw-ocr.zh.srt    straight OCR, for comparison
-002 Episode 02.google.en.srt     machine translation of the OCR, for comparison
-```
-
-**Series glossary: 生死訟, keep consistent across episodes**
-
-| Chinese | English | who |
-|---|---|---|
-| 馬海 | Ma Hai | son; car mechanic, about to go to sea (跑船) |
-| 馬潔 | Ma Jie | elder sister; runs the vegetable stall |
-| 馬泳 | Ma Yong | youngest sister, schoolgirl |
-| 馬洋 | Ma Yang | son of the father's other (wealthy) family; calls his mother 媽咪 "Mummy" |
-| 葉蔚 / 火柴頭 | Ye Wei / "Matchstick" | Ma Hai's tomboy friend |
-| 葉榮生 | Ye Rongsheng | Ye Wei's father, dying in hospital |
-| 狐狸精 | vixen | what each wife calls the other |
-| 冬節 / 過冬節 | the Winter Solstice | family festival; "冬比年大" = the Solstice matters more than New Year |
-| 大陸 | the mainland | |
-| 高利貸 / 放高利貸的 | loan sharks | |
-
-Ep 1 still has only the old OCR + Google pilot (first 11m40s, in `_subtitle_pilot`). Ep 2 is the only one done with the proof-read pass.
-
-### Quality you can promise
-
-- raw OCR: ~75% of lines correct
-- after junk filter + cleanup: **~80–85%**
-- remaining failures are unknown words (`是呀起上還肯給你開庭重` — `起上` is not a word) and lost capitalisation
-- **never claim a finished translation** from OCR + Google alone. Call it a rough draft. Only an episode that has been through the proof-read pass above counts as finished.
-
-### Verify before batching
-
-Always do **one slice first** (the user's own preference — they asked for a comparison before committing compute):
-
-```powershell
-python hardsub.py all "<ep1>" --start 0 --end 700
-```
-
-Then show them a few before/after pairs. Only batch after they approve.
+1. **Extend the series glossary** as you go — consistency of names matters more than any single line.
+2. `--fps 2` if cue boundaries look sloppy (2× OCR time).
+3. Higher-resolution source for OCR if one exists — pixels-per-glyph dominates the first guess.
+4. If a run must be delegated: give the subagent `translationclaude.md` + the glossary + the previous episode's `.en.srt` for context; afterwards verify counts/timings, spot-read ~8 random pairs, check gaps over 90 s against frames (they have always turned out to be silent montage), and merge its new glossary rows.
 
 ### Files and naming — this matters for playback
 
@@ -303,27 +241,6 @@ downloads\<series>\
 
 Keep raw and cleaned versions distinguishable (`…raw-ocr.zh.srt` vs `.zh.srt`) so the user can compare.
 
-### Cost
-
-| Stage | per 46-min episode |
-|---|---|
-| OCR (30 ms/frame @ 1 fps) | 60–90 s |
-| cleanup | instant |
-| translate (~360 cues, batched) | ~3 s |
-| **total** | **~2–3 min** |
-
-All 25 episodes ≈ **1–1.5 hours**.
-
-### How to do better next time (in priority order)
-
-1. **Feed it the highest-resolution copy.** OCR accuracy is dominated by pixels-per-glyph. A 854×480 copy beats 640×480 substantially; if a better master exists (aidrama, a different playlist), use it *for OCR* even if you keep the other for viewing.
-2. **Extend `CONFUSIONS` per series** (§ above) — biggest practical win, zero dependencies.
-3. **Try 2 fps** (`--fps 2`) when cue boundaries look sloppy; costs 2× OCR time.
-4. **LLM context pass:** hand the whole episode's Chinese SRT to a language model and ask it to repair lines using surrounding dialogue. This is what fixes words a 14-pixel glyph cannot resolve (`起上`). Rules cannot do it.
-5. **Better model:** PP-OCRv4/v5, or a `chinese_cht` recognition dict instead of the default simplified-leaning one. Check licence/size before committing.
-6. **Whisper alternative** (if the user only wants English, not the Chinese text): transcribe the Cantonese audio with `faster-whisper large-v3` and translate. Sidesteps OCR entirely, but wording follows the speech rather than the printed subtitles, and Cantonese ASR is weaker than OCR for this purpose.
-
----
 
 ## 6. Troubleshooting
 
@@ -332,7 +249,9 @@ All 25 episodes ≈ **1–1.5 hours**.
 | `playback 403 ... ACCESS_DENIED / DOMAIN` | Missing `Origin` header | The tool always sends `Origin: https://tvbanywherena.com`; if hand-calling the API, you must add it |
 | `VIDEO_NOT_PLAYABLE` | Title is geo/policy locked on Brightcove | Report it and move on; ~4 such series exist in the 2000s category alone |
 | Download stalls or 403s mid-transfer | `fastly_token` in the media URL expired | The tool re-resolves and retries automatically; a manual retry is `python tvbaw.py dl <REF>` again |
-| `no MP4 source` | Title is HLS-only | Handled automatically — the tool falls back to `ffmpeg` on the best HLS variant. If you see this error, the fallback itself failed: check `ffmpeg` is on PATH |
+| `no MP4 source` | Title is HLS-only | Handled automatically — the tool falls back to `ffmpeg` on the best HLS variant + its audio rendition. If you see this error, the fallback itself failed: check `ffmpeg` is on PATH |
+| File plays but is **silent** | HLS variant downloaded without its audio rendition | Already fixed in `download_hls()`; to repair existing files fetch only the audio and mux: `ffmpeg -protocol_whitelist file,http,https,tcp,tls,crypto -i video.mp4 -i <audio.m3u8> -map 0:v:0 -map 1:a:0 -c copy -bsf:a aac_adtstoasc out.mp4`. ~40 MB per episode instead of re-downloading |
+| `Protocol 'https' not on whitelist` | ffmpeg given a **local** m3u8 that references remote URIs | add `-protocol_whitelist file,http,https,tcp,tls,crypto` |
 | `ffmpeg is required for HLS-only titles` | ffmpeg missing | Install ffmpeg; HLS-only titles cannot be fetched without it |
 | Batch interrupted | — | Just rerun the same command: finished files are skipped, `.part` files resume |
 
@@ -341,7 +260,9 @@ All 25 episodes ≈ **1–1.5 hours**.
 ## 7. Other context you may need
 
 - **`aidrama.py`** — second tool in the same folder, for `aidrama.me`. AES-128 HLS with disguised `.html` playlists and `.png` segments. Ceiling **854×480 16:9**, ~170 MB/ep, ~19 MB/s, no gates. Its `Hydrax` server is a trap: **360p preview only**, full 720p is behind 5 ads + Cloudflare Turnstile — do not attempt it.
-- **`hardsub.py`** — burned-in subtitle recovery (§5b). `ocr`, `cleanup`, `translate`, `all`. Needs `rapidocr-onnxruntime` + `opencc-python-reimplemented` + ffmpeg.
+- **`hardsub.py`** — burned-in subtitle recovery. `ocr`, `sheets`, `apply` (the §5b workflow), plus `cleanup`/`translate`/`all` as a rough fallback. Needs `rapidocr-onnxruntime`, `opencc-python-reimplemented`, Pillow and ffmpeg.
+- **`translationclaude.md`** — the authoritative subtitling method, plus the 生死訟 glossary inline.
+- **`glossary-war-and-beauty.md`** — glossary for 金枝慾孽 / War and Beauty (2004).
 - **`estimate_category.py`** — sizes up a whole browse category before committing. Already run for the 2000s: 227 shows, 6,204 episodes, **≈4.2 TB, ≈35 h** at line speed.
 - **`README.md`** — the full technical write-up of both sites (API chains, measured speeds).
 - **`HANDOFF` facts already verified:** Brightcove account `5324042807001`, player `t3oBfbU6IW`, playlist endpoint `GET /api/playlist?bcov=<id>`, policy key scraped from the player config and cached in `.state/policykey.txt`, playlist ids read from `bcovIds` in the series page.
@@ -351,16 +272,17 @@ All 25 episodes ≈ **1–1.5 hours**.
 ## 8. Hard rules
 
 1. **ALWAYS highest quality.** The tool picks the best source automatically — never downgrade for speed, disk, or convenience.
-2. **Don't ask which episodes or which quality** — default is all episodes at highest. The user will say if they want a subset.
-3. **Don't re-implement the API** — the tool works. If it fails, fix the tool, don't hand-roll curl.
-4. **Don't dump download progress** into the chat. Poll the folder.
-5. **Always verify with ffprobe** before saying "done".
-6. **Quote real numbers** you measured (resolution, size, duration, speed) — never assume.
-7. If disk space is short, report it *before* starting rather than filling the drive.
-8. Say where the files are, with the absolute path.
-9. **"Translate the subtitles" = §5b, not a player setting.** Check `text_tracks` first: real tracks → `tvbaw.py subs`; burned-in text → `hardsub.py`. Never tell the user a player can translate hardsub.
-10. **Never present OCR output as a finished translation.** Run one slice, show before/after, get approval, then batch.
-11. **Name SRTs to match the video basename** so players auto-load them, and mark partial coverage in the filename.
+2. **NEVER a dub.** Cantonese (`tc`/`yue`) first, Mandarin (`cmn`/`zh`) second. If neither exists, report it and download nothing — do not fall back to `vn`/`es`/`en` unless the user names that language explicitly.
+3. **Don't ask which episodes or which quality** — default is all episodes at highest. The user will say if they want a subset.
+4. **Don't re-implement the API** — the tool works. If it fails, fix the tool, don't hand-roll curl.
+5. **Don't dump download progress** into the chat. Poll the folder.
+6. **Always verify with ffprobe — video AND audio streams, plus duration.** Checking resolution and runtime alone is how a batch of 30 silent files once got reported as done. An episode must show exactly one `codec_type=video` and one `codec_type=audio`.
+7. **Quote real numbers** you measured (resolution, size, duration, speed) — never assume.
+8. If disk space is short, report it *before* starting rather than filling the drive.
+9. Say where the files are, with the absolute path.
+10. **"Translate the subtitles" = §5b, not a player setting.** Check `text_tracks` first: real tracks → `tvbaw.py subs`; burned-in text → `hardsub.py`. Never tell the user a player can translate hardsub.
+11. **Never present OCR output as a finished translation.** Run one slice, show before/after, get approval, then batch.
+12. **Name SRTs to match the video basename** so players auto-load them, and mark partial coverage in the filename.
 
 ---
 
