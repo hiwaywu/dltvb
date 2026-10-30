@@ -177,14 +177,47 @@ def playlist(pid: str) -> list[dict]:
     return eps
 
 
+# Language policy (user's standing rule): Cantonese first, then Mandarin.
+# NEVER auto-select a dub like vn/es/en — if the title has neither Cantonese nor
+# Mandarin, report it and download nothing.
+LANG_ORDER = [
+    ("tc", "Cantonese"), ("yue", "Cantonese"), ("cantonese", "Cantonese"),
+    ("zh-hk", "Cantonese"),
+    ("cmn", "Mandarin"), ("zh", "Mandarin"), ("zh-cn", "Mandarin"),
+    ("zh-tw", "Mandarin"), ("mandarin", "Mandarin"), ("guo", "Mandarin"),
+]
+REJECTED_LANGS = {"vn", "vi", "es", "en"}     # dubs the user does not want
+
+
+def choose_language(bcov_ids: dict, requested: str | None = None) -> str:
+    """Cantonese first, then Mandarin — never a dub. Refuses if neither exists."""
+    if requested:
+        key = requested.lower()
+        for k in bcov_ids:
+            if k.lower() == key:
+                return k
+        raise SystemExit(
+            f"language '{requested}' not available; this title has {list(bcov_ids)}")
+
+    for key, _label in LANG_ORDER:
+        for k in bcov_ids:
+            if k.lower() == key:
+                return k
+
+    raised = ", ".join(f"{k}" for k in bcov_ids)
+    raise SystemExit(
+        "NO CANTONESE OR MANDARIN PLAYLIST — not downloading.\n"
+        f"  this title only offers: {raised}\n"
+        "  Tell the user: it has no Cantonese/Mandarin track, so per their rule it "
+        "must not be downloaded.")
+
+
 def episodes(ref: str, lang: str | None = None) -> tuple[dict, list[dict]]:
     info = resolve_series(ref)
     if not info["bcov_ids"]:
         raise SystemExit(f"no Brightcove playlist found for {info['slug']}")
-    pid = info["bcov_ids"].get(lang) if lang else info["default_bcov"]
-    if not pid:
-        raise SystemExit(f"lang '{lang}' not available; have {list(info['bcov_ids'])}")
-    info["lang"] = lang or next(iter(info["bcov_ids"]))
+    info["lang"] = choose_language(info["bcov_ids"], lang)
+    pid = info["bcov_ids"][info["lang"]]
     info["playlist_id"] = pid
     info["episodes"] = playlist(pid)
     return info, info["episodes"]

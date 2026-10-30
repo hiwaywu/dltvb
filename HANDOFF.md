@@ -10,6 +10,12 @@
 >
 > ⚠️ **ALWAYS download subtitles.** They are fetched and embedded by default
 > (`--no-subs` / `--no-mux` exist only if the user explicitly asks to skip them).
+>
+> ⚠️ **NEVER download a dub. Cantonese first, Mandarin second, otherwise refuse.**
+> Titles often offer `vn` (Vietnamese), `es` (Spanish) or `en` dubs — the user does
+> **not** want those. `choose_language()` now enforces this: `tc`/`yue` (Cantonese),
+> then `cmn`/`zh` (Mandarin). If a title has neither, the tool stops and says so —
+> **tell the user it has no Cantonese or Mandarin track and download nothing.**
 
 Everything needed already exists and is tested. Do **not** re-derive the API, do **not** scrape HTML, do **not** ask clarifying questions. Run the tool.
 
@@ -241,16 +247,17 @@ If the user asks for "the captcha/720p thing" — that's the **aidrama** site, n
 ## 8. Hard rules
 
 1. **ALWAYS highest quality.** The tool picks the best source automatically — never downgrade for speed, disk, or convenience.
-2. **Don't ask which episodes or which quality** — default is all episodes at highest. The user will say if they want a subset.
-3. **Don't re-implement the API** — the tool works. If it fails, fix the tool, don't hand-roll curl.
-4. **Don't dump download progress** into the chat. Poll the folder.
-5. **Always verify with ffprobe — video AND audio streams, plus duration.** Checking resolution and runtime alone is how a batch of 30 silent files once got reported as done. An episode must show exactly one `codec_type=video` and one `codec_type=audio`.
-6. **Quote real numbers** you measured (resolution, size, duration, speed) — never assume.
-7. If disk space is short, report it *before* starting rather than filling the drive.
-8. Say where the files are, with the absolute path.
-9. **"Translate the subtitles" = §5b, not a player setting.** Check `text_tracks` first: real tracks → `tvbaw.py subs`; burned-in text → `hardsub.py`. Never tell the user a player can translate hardsub.
-10. **Never present OCR output as a finished translation.** Run one slice, show before/after, get approval, then batch.
-11. **Name SRTs to match the video basename** so players auto-load them, and mark partial coverage in the filename.
+2. **NEVER a dub.** Cantonese (`tc`/`yue`) first, Mandarin (`cmn`/`zh`) second. If neither exists, report it and download nothing — do not fall back to `vn`/`es`/`en` unless the user names that language explicitly.
+3. **Don't ask which episodes or which quality** — default is all episodes at highest. The user will say if they want a subset.
+4. **Don't re-implement the API** — the tool works. If it fails, fix the tool, don't hand-roll curl.
+5. **Don't dump download progress** into the chat. Poll the folder.
+6. **Always verify with ffprobe — video AND audio streams, plus duration.** Checking resolution and runtime alone is how a batch of 30 silent files once got reported as done. An episode must show exactly one `codec_type=video` and one `codec_type=audio`.
+7. **Quote real numbers** you measured (resolution, size, duration, speed) — never assume.
+8. If disk space is short, report it *before* starting rather than filling the drive.
+9. Say where the files are, with the absolute path.
+10. **"Translate the subtitles" = §5b, not a player setting.** Check `text_tracks` first: real tracks → `tvbaw.py subs`; burned-in text → `hardsub.py`. Never tell the user a player can translate hardsub.
+11. **Never present OCR output as a finished translation.** Run one slice, show before/after, get approval, then batch.
+12. **Name SRTs to match the video basename** so players auto-load them, and mark partial coverage in the filename.
 
 ---
 

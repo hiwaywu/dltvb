@@ -27,6 +27,11 @@ python hardsub.py all "<episode>.mp4"          # OCR + translate burned-in subti
 Highest quality and subtitles are **on by default** — no flags needed.
 `--no-subs` / `--no-mux` exist only to opt out.
 
+**Language policy:** Cantonese (`tc`/`yue`) is always preferred, then Mandarin
+(`cmn`/`zh`). Dubs (`vn`, `es`, `en`) are never auto-selected — if a title has no
+Cantonese or Mandarin track the tool refuses and says so, rather than quietly
+downloading a dub.
+
 Output:
 
 ```
