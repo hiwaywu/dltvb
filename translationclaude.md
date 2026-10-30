@@ -296,6 +296,32 @@ Nothing else. No raw OCR, no Google translation: the user asked for only these t
 
 ---
 
+## Running a whole series: parallel readers
+
+A 20-episode series was completed with this method by splitting each episode's
+contact sheets across **four subagents** (about 10-21 sheets each), then merging
+their `N|中文|English` files and validating coverage before `apply`:
+
+1. `hardsub.py ocr` + `hardsub.py sheets` for every episode first (machine work,
+   one OCR at a time — the user asked for that, concurrent OCR makes the PC lag).
+2. Four readers per episode, each told: the method, the series glossary, the
+   previously finished episode for tone, and "story only, blank theme song and
+   credits with `N||`".
+3. Merge, then **assert every cue number 1..N is present** before `apply`.
+   `apply` refuses on a gap, which is the safety net.
+4. Verify the built pair: same cue count, identical timings, no Chinese in the
+   English column, no blank lines.
+
+Two traps worth knowing:
+
+- **`apply` cannot read a `---NAMES---` block.** It `int()`s the first field of
+  every non-blank line, so a names block crashes it. Keep glossary rows in the
+  agent's report (or a separate file) and strip them at merge time.
+- **Readers disagree on romanisation and on who-is-who after a time jump.** Give
+  every reader the cast note up front (for 天若有情: 華京生 the boy of eps 1-4 *is*
+  the adult 生哥 — do not invent a new character), and normalise variant spellings
+  (Da Mao/Damao, Rong/Yung Sang Kee) in the merge step, not by hand.
+
 ## Cost and time
 
 Per 46-minute episode: OCR about 2 min, sheets about 1 min, then reading about 50 sheets and writing about 500 review lines, plus the second check. That last part is most of the time, roughly **30–45 minutes of Claude working**. It's also a real share of the user's subscription usage, so expect to hit usage limits after a few episodes and continue in the next window. Work **one episode at a time**, finishing each, second check included, before starting the next.
