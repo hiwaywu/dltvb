@@ -59,7 +59,9 @@ common with the previous one, check for a time jump before inventing new people.
 | 小孫 / 小孫哥 | Little Sun / Brother Sun | gang member turned loan shark |
 | 阿容 / 大嫂 / 李太太 | Ah Rong / Sister-in-law / Mrs Lee | Ah Quan's widow, Xiao Cheng's mother |
 | 李展成 / 小成 | Li Zhancheng / Xiao Cheng | her small son |
+| 阿成 | Ah Cheng | how ep 20's subtitles spell 小成; keep the Chinese as shown, English stays "Xiao Cheng" |
 | 泉媽 | Grandma Quan | Ah Quan's mother; Ah Rong calls her 媽 |
+| 黃先生 | Mr Wong | Ah Rong's second husband, an ex-sailor (跑船); takes her and the children to America |
 | 忠伯 | Uncle Zhong | old man in the family shop |
 | 容生記 | Rong Sang Kee | the family shop's name |
 | 夏小姐 / 夏姑娘 | Miss Xia | teacher at Xiao Cheng's school |
